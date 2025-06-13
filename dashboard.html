@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; }
+    .container { max-width: 700px; margin: 40px auto; background: #fff; padding: 25px 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .header-box { background-color: #007BFF; color: #fff; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+    .header-box h2 { margin: 0; }
+    button { padding: 10px 20px; border: none; border-radius: 5px; background-color: #007BFF; color: white; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    .button-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-box">
+      <h2 id="welcome-msg">Welcome to the Dashboard</h2>
+      <button id="logout-btn">Logout</button>
+    </div>
+
+    <div class="button-row">
+      <button onclick="window.location.href='create-event.html'">Create Event</button>
+      <button onclick="window.location.href='league.html'">View League Table</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Upcoming Events</h2>
+    <div id="events-list"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
