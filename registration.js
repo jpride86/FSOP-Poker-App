@@ -9,6 +9,7 @@ window.onload = function () {
   };
 
   firebase.initializeApp(firebaseConfig);
+  console.log("Origin:", window.location.origin); 
   const auth = firebase.auth();
   const db = firebase.firestore();
 
