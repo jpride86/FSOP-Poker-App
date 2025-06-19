@@ -55,24 +55,38 @@ function startIOSWakeLockFallback() {
 
 function nextLevel() {
   if (currentLevelIndex < standardBlinds.length - 1) {
-    currentLevelIndex++;
-    const next = standardBlinds[currentLevelIndex];
-    timeRemaining = next.duration * 60;
+    document.getElementById('next-btn').disabled = true;
+    setTimeout(() => {
+      document.getElementById('next-btn').disabled = false;
+    }, 300);
+
+    pauseTimer(); // prevents timer from double triggering
+    currentLevelIndex += 1;
+    const lvl = standardBlinds[currentLevelIndex];
+    timeRemaining = lvl.duration * 60;
     alarmPlayed = false;
     document.body.classList.remove('flash-red');
     updateBlindDisplay();
+    console.log("Next level:", currentLevelIndex);
   }
 }
 
 
 function previousLevel() {
   if (currentLevelIndex > 0) {
-    currentLevelIndex--;
-    const prev = standardBlinds[currentLevelIndex];
-    timeRemaining = prev.duration * 60;
+    document.getElementById('previous-btn').disabled = true;
+    setTimeout(() => {
+      document.getElementById('previous-btn').disabled = false;
+    }, 300);
+
+    pauseTimer();
+    currentLevelIndex -= 1;
+    const lvl = standardBlinds[currentLevelIndex];
+    timeRemaining = lvl.duration * 60;
     alarmPlayed = false;
     document.body.classList.remove('flash-red');
     updateBlindDisplay();
+    console.log("Previous level:", currentLevelIndex);
   }
 }
 
