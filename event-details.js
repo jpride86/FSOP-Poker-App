@@ -549,3 +549,22 @@ function resetTimer() {
   updateBlindDisplay();
 }
 
+function nextLevel() {
+  if (currentLevelIndex < standardBlinds.length - 1) {
+    currentLevelIndex++;
+    timeRemaining = standardBlinds[currentLevelIndex].duration * 60;
+    alarmPlayed = false;
+    document.body.classList.remove('flash-red');
+    updateBlindDisplay();
+  }
+}
+
+function previousLevel() {
+  if (currentLevelIndex > 0) {
+    currentLevelIndex--;
+    timeRemaining = standardBlinds[currentLevelIndex].duration * 60;
+    alarmPlayed = false;
+    document.body.classList.remove('flash-red');
+    updateBlindDisplay();
+  }
+}
