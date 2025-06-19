@@ -56,17 +56,20 @@ function startIOSWakeLockFallback() {
 function nextLevel() {
   if (currentLevelIndex < standardBlinds.length - 1) {
     currentLevelIndex++;
-    timeRemaining = standardBlinds[currentLevelIndex].duration * 60;
+    const next = standardBlinds[currentLevelIndex];
+    timeRemaining = next.duration * 60;
     alarmPlayed = false;
     document.body.classList.remove('flash-red');
     updateBlindDisplay();
   }
 }
 
+
 function previousLevel() {
   if (currentLevelIndex > 0) {
     currentLevelIndex--;
-    timeRemaining = standardBlinds[currentLevelIndex].duration * 60;
+    const prev = standardBlinds[currentLevelIndex];
+    timeRemaining = prev.duration * 60;
     alarmPlayed = false;
     document.body.classList.remove('flash-red');
     updateBlindDisplay();
@@ -518,11 +521,11 @@ function updateBlindDisplay() {
     elBlinds.textContent = '';
   } else {
     elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
+    elBlinds.innerHTML = `<strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)`;
+  }
 
-elBlinds.innerHTML = `<strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)`;
-document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
-
-}
+  // ✅ Always update the timer display
+  document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
 }
 function formatTime(seconds) {
   const min = Math.floor(seconds / 60);
