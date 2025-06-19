@@ -274,6 +274,12 @@ document.getElementById('previous-btn')?.addEventListener('click', previousLevel
 updateBlindDisplay();
 
 })(); // ✅ Closes the async IIFE
+  // ✅ Live update knockout list across users
+db.collection('events').doc(eventId).collection('rsvps')
+  .onSnapshot(() => {
+    updateKnockoutList(eventId);
+  });
+
 };      // ✅ Closes window.onload
 
 function togglePaid(eventId, userId, btn) {
@@ -286,8 +292,6 @@ function togglePaid(eventId, userId, btn) {
     });
   });
 }
-
-
 function toggleDealer(eventId, userId, btn) {
   const ref = firebase.firestore().collection('events').doc(eventId).collection('rsvps').doc(userId);
   ref.get().then(doc => {
@@ -471,7 +475,9 @@ function updatePotAndPayouts() {
     if (potSection) {
       const startingChips = parseFloat(document.getElementById('starting-chips').value) || 1500;
 const totalChips = startingChips * (paidPlayers.length + totalRebuys);
-const avgChips = totalChips / players.length;
+
+const remainingPlayers = players.filter(p => !p.knockedOut).length || 1; // avoid division by 0
+const avgChips = totalChips / remainingPlayers;
 
 document.getElementById('total-chips-text').innerHTML = `<strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}`;
 document.getElementById('average-stack-text').innerHTML = `<strong>Average Stack:</strong> ${Math.round(avgChips).toLocaleString()}`;
