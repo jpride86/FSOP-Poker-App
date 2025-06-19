@@ -632,8 +632,9 @@ db.collection('events').doc(eventId).collection('timer').doc('state')
         if (!isPaused) startTimer();
         else pauseTimer();
 
-        updateBlindDisplay();
+                updateBlindDisplay();
       }
     }
   });
+} // ✅ ← Add this final brace to close updateKnockoutList()
 
