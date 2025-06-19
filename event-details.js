@@ -22,6 +22,15 @@ let alarmPlayed = false;
 
 const alarmSound = new Audio('alarm_mixkit.mp3');
 
+function syncTimerStateToFirestore() {
+  db.collection('events').doc(eventId).collection('timer').doc('state').set({
+    currentLevelIndex,
+    timeRemaining,
+    isPaused,
+    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
 const standardBlinds = [
   { level: 1, small: 5, big: 10, duration: 30, type: 'blind' },
   { level: 2, small: 10, big: 20, duration: 30, type: 'blind' },
@@ -90,14 +99,6 @@ function startIOSWakeLockFallback() {
       console.warn('iOS fallback video failed to play:', err);
     });
   }
-}
-function syncTimerStateToFirestore() {
-  db.collection('events').doc(eventId).collection('timer').doc('state').set({
-    currentLevelIndex,
-    timeRemaining,
-    isPaused,
-    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-  });
 }
 
 function nextLevel() {
