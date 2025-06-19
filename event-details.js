@@ -636,5 +636,5 @@ db.collection('events').doc(eventId).collection('timer').doc('state')
       }
     }
   });
-} // ✅ ← Add this final brace to close updateKnockoutList()
+
 
