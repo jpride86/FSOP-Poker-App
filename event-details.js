@@ -36,6 +36,24 @@ const standardBlinds = [
   { level: 9, small: 500, big: 1000, duration: 30, type: 'blind' }
 ];
 timeRemaining = standardBlinds[currentLevelIndex].duration * 60;
+function updateBlindDisplay() {
+  const lvl = standardBlinds[currentLevelIndex];
+  const elLevel = document.getElementById('current-level');
+  const elBlinds = document.getElementById('blinds');
+
+  if (lvl.type === 'break') {
+    elLevel.textContent = lvl.level;
+    elLevel.style.color = 'red';
+    elBlinds.textContent = '';
+  } else {
+    elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
+    elBlinds.innerHTML = `<strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)`;
+  }
+
+  // ✅ Always update the timer display
+  document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
+}
+
 function logout() {
   auth.signOut().then(() => window.location.href = 'index.html');
 }
@@ -114,26 +132,6 @@ syncTimerStateToFirestore(); // ✅ after updating level
 
   }
 }
-
-
-function updateBlindDisplay() {
-  const lvl = standardBlinds[currentLevelIndex];
-  const elLevel = document.getElementById('current-level');
-  const elBlinds = document.getElementById('blinds');
-
-  if (lvl.type === 'break') {
-    elLevel.textContent = lvl.level;
-    elLevel.style.color = 'red';
-    elBlinds.textContent = '';
-  } else {
-    elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
-    elBlinds.innerHTML = `<strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)`;
-  }
-
-  // ✅ Always update the timer display
-  document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
-}
-
 
 window.onload = function () {
   (async () => {
