@@ -245,6 +245,7 @@ updateDealerPayoutSection();
 document.getElementById('pot-info').style.display = 'block';
   rsvpSection.style.display = 'block';
     updateKnockoutList(eventId);  // ✅ Ensures knockout list (incl. winner) shows after refresh
+    updatePotAndPayouts(); // ✅ Add this line to update average stack
 
 
   // ✅ Knockout List Rendering
@@ -476,7 +477,8 @@ function updatePotAndPayouts() {
       const startingChips = parseFloat(document.getElementById('starting-chips').value) || 1500;
 const totalChips = startingChips * (paidPlayers.length + totalRebuys);
 
-const remainingPlayers = players.filter(p => !p.knockedOut).length || 1; // avoid division by 0
+const remainingPlayers = players.filter(p => p.paid && !p.knockedOut).length || 1;
+
 const avgChips = totalChips / remainingPlayers;
 
 document.getElementById('total-chips-text').innerHTML = `<strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}`;
