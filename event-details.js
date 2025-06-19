@@ -176,6 +176,8 @@ if (knockedOutPlayers.length > 0) {
 
   knockoutSection.style.display = 'block';
 }
+document.getElementById('next-btn')?.addEventListener('click', nextLevel);
+document.getElementById('previous-btn')?.addEventListener('click', previousLevel);
 
 })(); // ✅ Closes the async IIFE
 };      // ✅ Closes window.onload
