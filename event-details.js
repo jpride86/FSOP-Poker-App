@@ -533,7 +533,10 @@ async function updateKnockoutList(eventId) {
     .filter(p => p.knockedOut && p.knockedOutAt)
     .sort((a, b) => a.knockedOutAt - b.knockedOutAt);
 
-  if (knockedOutPlayers.length > 0) {
+  // 🧠 Track who’s knocked out
+  const knockedOutIds = new Set(knockedOutPlayers.map(p => p.id));
+
+  // 🔁 Render all knocked out players in order
   knockedOutPlayers.forEach((p, i) => {
     const place = players.length - i;
     const points = getPoints(place, players.length);
@@ -542,21 +545,16 @@ async function updateKnockoutList(eventId) {
     knockoutList.appendChild(li);
   });
 
-  // 🏆 Add winner (last standing player)
-  const knockedOutIds = new Set(knockedOutPlayers.map(p => p.id));
+  // 🏆 Add winner at the bottom (if one remaining)
   const winner = players.find(p => !knockedOutIds.has(p.id));
   if (winner) {
     const li = document.createElement('li');
     li.innerHTML = `🏆 ${winner.firstName || 'Unknown'} ${winner.lastName || ''} <strong>(1st Place, Points: ${getPoints(1, players.length)})</strong>`;
-    knockoutList.appendChild(li);
-
+    knockoutList.appendChild(li); // ✅ Appended at the end
   }
 
-  knockoutSection.style.display = 'block';
-} else {
-  knockoutSection.style.display = 'none';
+  knockoutSection.style.display = players.length > 1 ? 'block' : 'none';
 }
-} // ✅ Closes updateKnockoutList function
 
 
 
