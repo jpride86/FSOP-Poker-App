@@ -517,19 +517,28 @@ async function updateKnockoutList(eventId) {
     .sort((a, b) => a.knockedOutAt - b.knockedOutAt);
 
   if (knockedOutPlayers.length > 0) {
-    knockedOutPlayers.forEach((p, i) => {
-  const place = players.length - i;
-  const points = getPoints(place, players.length);
-  const li = document.createElement('li');
-  li.textContent = `${p.firstName || 'Unknown'} ${p.lastName || ''} (Place: ${place}, Points: ${points})`;
-  knockoutList.appendChild(li);
-});
+  knockedOutPlayers.forEach((p, i) => {
+    const place = players.length - i;
+    const points = getPoints(place, players.length);
+    const li = document.createElement('li');
+    li.textContent = `${p.firstName || 'Unknown'} ${p.lastName || ''} (Place: ${place}, Points: ${points})`;
+    knockoutList.appendChild(li);
+  });
 
-    knockoutSection.style.display = 'block';
-  } else {
-    knockoutSection.style.display = 'none';
+  // 🏆 Add winner (last standing player)
+  const knockedOutIds = new Set(knockedOutPlayers.map(p => p.id));
+  const winner = players.find(p => !knockedOutIds.has(p.id));
+  if (winner) {
+    const li = document.createElement('li');
+    li.innerHTML = `🏆 ${winner.firstName || 'Unknown'} ${winner.lastName || ''} <strong>(1st Place, Points: ${getPoints(1, players.length)})</strong>`;
+    knockoutList.insertBefore(li, knockoutList.firstChild);
   }
-};
+
+  knockoutSection.style.display = 'block';
+} else {
+  knockoutSection.style.display = 'none';
+}
+
 
 
 function updateBlindDisplay() {
