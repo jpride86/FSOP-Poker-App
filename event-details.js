@@ -14,7 +14,28 @@ const auth = firebase.auth();
 
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get('id'); // ✅ Moved here — global
+let currentLevelIndex = 0;
+let timerInterval = null;
+let timeRemaining = 0;
+let isPaused = true;
+let alarmPlayed = false;
 
+const alarmSound = new Audio('alarm_mixkit.mp3');
+
+const standardBlinds = [
+  { level: 1, small: 5, big: 10, duration: 30, type: 'blind' },
+  { level: 2, small: 10, big: 20, duration: 30, type: 'blind' },
+  { level: 3, small: 15, big: 30, duration: 30, type: 'blind' },
+  { level: 'Break 1 - Last Re-buy, $5 color-up', small: 0, big: 0, duration: 5, type: 'break' },
+  { level: 4, small: 25, big: 50, duration: 30, type: 'blind' },
+  { level: 5, small: 50, big: 100, duration: 30, type: 'blind' },
+  { level: 6, small: 100, big: 200, duration: 30, type: 'blind' },
+  { level: 'Break 2 - $25 color-up', small: 0, big: 0, duration: 5, type: 'break' },
+  { level: 7, small: 200, big: 400, duration: 30, type: 'blind' },
+  { level: 8, small: 400, big: 800, duration: 30, type: 'blind' },
+  { level: 9, small: 500, big: 1000, duration: 30, type: 'blind' }
+];
+timeRemaining = standardBlinds[currentLevelIndex].duration * 60;
 function logout() {
   auth.signOut().then(() => window.location.href = 'index.html');
 }
@@ -69,6 +90,8 @@ function nextLevel() {
     updateBlindDisplay(); // ✅ ADD THIS LINE
 
     console.log("Next level:", currentLevelIndex);
+syncTimerStateToFirestore(); // ✅ after updating level
+
   }
 }
 
@@ -87,6 +110,8 @@ function previousLevel() {
     document.body.classList.remove('flash-red');
     updateBlindDisplay();
     console.log("Previous level:", currentLevelIndex);
+syncTimerStateToFirestore(); // ✅ after updating level
+
   }
 }
 
@@ -507,26 +532,6 @@ async function updateKnockoutList(eventId) {
 };
 
 
-const standardBlinds = [
-  { level: 1, small: 5, big: 10, duration: 30, type: 'blind' },
-  { level: 2, small: 10, big: 20, duration: 30, type: 'blind' },
-  { level: 3, small: 15, big: 30, duration: 30, type: 'blind' },
-  { level: 'Break 1 - Last Re-buy, $5 color-up', small: 0, big: 0, duration: 5, type: 'break' },
-  { level: 4, small: 25, big: 50, duration: 30, type: 'blind' },
-  { level: 5, small: 50, big: 100, duration: 30, type: 'blind' },
-  { level: 6, small: 100, big: 200, duration: 30, type: 'blind' },
-  { level: 'Break 2 - $25 color-up', small: 0, big: 0, duration: 5, type: 'break' },
-  { level: 7, small: 200, big: 400, duration: 30, type: 'blind' },
-  { level: 8, small: 400, big: 800, duration: 30, type: 'blind' },
-  { level: 9, small: 500, big: 1000, duration: 30, type: 'blind' }
-];
-let currentLevelIndex = 0;
-let timerInterval;
-let timeRemaining = standardBlinds[0].duration * 60;
-let isPaused = true;
-let alarmPlayed = false;
-
-const alarmSound = new Audio('alarm_mixkit.mp3'); // Replace with your actual mp3 file
 function updateBlindDisplay() {
   const lvl = standardBlinds[currentLevelIndex];
   const elLevel = document.getElementById('current-level');
@@ -560,9 +565,10 @@ function startTimer() {
 
 
   timerInterval = setInterval(() => {
-    if (timeRemaining > 0) {
-      timeRemaining--;
-document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
+  if (timeRemaining > 0) {
+    timeRemaining--;
+    document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
+    syncTimerStateToFirestore(); // ✅ sync every second
 
       if (timeRemaining === 60 && !alarmPlayed) {
         alarmPlayed = true;
@@ -595,6 +601,30 @@ function resetTimer() {
   alarmPlayed = false;
   document.body.classList.remove('flash-red');
   updateBlindDisplay();
+syncTimerStateToFirestore(); // ✅ broadcast reset
+
 }
 
+db.collection('events').doc(eventId).collection('timer').doc('state')
+  .onSnapshot(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+
+      // Only update if something changed
+      if (
+        data.currentLevelIndex !== currentLevelIndex ||
+        data.timeRemaining !== timeRemaining ||
+        data.isPaused !== isPaused
+      ) {
+        currentLevelIndex = data.currentLevelIndex;
+        timeRemaining = data.timeRemaining;
+        isPaused = data.isPaused;
+
+        if (!isPaused) startTimer();
+        else pauseTimer();
+
+        updateBlindDisplay();
+      }
+    }
+  });
 
