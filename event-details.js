@@ -545,7 +545,8 @@ async function updateKnockoutList(eventId) {
   const knockoutList = document.getElementById('knockout-list');
   knockoutList.innerHTML = '';
 const eventDoc = await db.collection('events').doc(eventId).get();
-const winnerId = eventDoc.data().winnerId || null;
+const winnerId = eventDoc.exists && eventDoc.data().winnerId ? eventDoc.data().winnerId : null;
+
 
   const knockedOutPlayers = players
     .filter(p => p.knockedOut && p.knockedOutAt)
