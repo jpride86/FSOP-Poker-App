@@ -548,7 +548,8 @@ async function updateKnockoutList(eventId) {
   if (winner) {
     const li = document.createElement('li');
     li.innerHTML = `🏆 ${winner.firstName || 'Unknown'} ${winner.lastName || ''} <strong>(1st Place, Points: ${getPoints(1, players.length)})</strong>`;
-    knockoutList.insertBefore(li, knockoutList.firstChild);
+    knockoutList.appendChild(li);
+
   }
 
   knockoutSection.style.display = 'block';
