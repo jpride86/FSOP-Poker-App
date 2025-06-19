@@ -66,7 +66,9 @@ function nextLevel() {
     timeRemaining = lvl.duration * 60;
     alarmPlayed = false;
     document.body.classList.remove('flash-red');
-    updateBlindDisplay();
+    
+    updateBlindDisplay(); // ✅ ADD THIS LINE
+
     console.log("Next level:", currentLevelIndex);
   }
 }
@@ -216,6 +218,9 @@ if (knockedOutPlayers.length > 0) {
 }
 document.getElementById('next-btn')?.addEventListener('click', nextLevel);
 document.getElementById('previous-btn')?.addEventListener('click', previousLevel);
+
+// ✅ Final call to update display — place at end of window.onload:
+updateBlindDisplay();
 
 })(); // ✅ Closes the async IIFE
 };      // ✅ Closes window.onload
@@ -522,7 +527,7 @@ let timerInterval;
 let timeRemaining = standardBlinds[0].duration * 60;
 let isPaused = true;
 let alarmPlayed = false;
-updateBlindDisplay();
+
 const alarmSound = new Audio('alarm_mixkit.mp3'); // Replace with your actual mp3 file
 function updateBlindDisplay() {
   const lvl = standardBlinds[currentLevelIndex];
