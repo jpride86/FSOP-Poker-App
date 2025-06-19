@@ -116,6 +116,25 @@ syncTimerStateToFirestore(); // ✅ after updating level
 }
 
 
+function updateBlindDisplay() {
+  const lvl = standardBlinds[currentLevelIndex];
+  const elLevel = document.getElementById('current-level');
+  const elBlinds = document.getElementById('blinds');
+
+  if (lvl.type === 'break') {
+    elLevel.textContent = lvl.level;
+    elLevel.style.color = 'red';
+    elBlinds.textContent = '';
+  } else {
+    elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
+    elBlinds.innerHTML = `<strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)`;
+  }
+
+  // ✅ Always update the timer display
+  document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
+}
+
+
 window.onload = function () {
   (async () => {
     await requestWakeLock();
@@ -541,23 +560,6 @@ async function updateKnockoutList(eventId) {
 
 
 
-function updateBlindDisplay() {
-  const lvl = standardBlinds[currentLevelIndex];
-  const elLevel = document.getElementById('current-level');
-  const elBlinds = document.getElementById('blinds');
-
-  if (lvl.type === 'break') {
-    elLevel.textContent = lvl.level;
-    elLevel.style.color = 'red';
-    elBlinds.textContent = '';
-  } else {
-    elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
-    elBlinds.innerHTML = `<strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)`;
-  }
-
-  // ✅ Always update the timer display
-  document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
-}
 function formatTime(seconds) {
   const min = Math.floor(seconds / 60);
   const sec = seconds % 60;
