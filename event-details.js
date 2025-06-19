@@ -91,6 +91,14 @@ function startIOSWakeLockFallback() {
     });
   }
 }
+function syncTimerStateToFirestore() {
+  db.collection('events').doc(eventId).collection('timer').doc('state').set({
+    currentLevelIndex,
+    timeRemaining,
+    isPaused,
+    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
 
 function nextLevel() {
   if (currentLevelIndex < standardBlinds.length - 1) {
