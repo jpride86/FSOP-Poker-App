@@ -235,6 +235,8 @@ updatePotAndPayouts();  // Initial rendering of totals
 updateDealerPayoutSection();
 document.getElementById('pot-info').style.display = 'block';
   rsvpSection.style.display = 'block';
+    updateKnockoutList(eventId);  // ✅ Ensures knockout list (incl. winner) shows after refresh
+
 
   // ✅ Knockout List Rendering
 const knockedOutPlayers = players
