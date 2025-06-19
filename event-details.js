@@ -488,23 +488,28 @@ function toggleKnockout(eventId, userId, btn) {
       ? { knockedOut, knockedOutAt: Date.now() }
       : { knockedOut, knockedOutAt: firebase.firestore.FieldValue.delete() };
 
-    ref.update(update).then(() => {
-      // Update button text
-      btn.textContent = knockedOut ? '🔁 Undo Knockout' : '💀 Knockout';
+    ref.update(update).then(async () => {
+  // Check if only 1 player remains un-knocked out
+  const snapshot = await db.collection('events').doc(eventId).collection('rsvps').get();
+  const remaining = snapshot.docs.filter(doc => !doc.data().knockedOut);
+  const eventRef = db.collection('events').doc(eventId);
 
-      // Update LI class (line-through if knocked out)
-      const li = btn.closest('li');
-      if (li) {
-        if (knockedOut) {
-          li.classList.add('knocked-out');
-        } else {
-          li.classList.remove('knocked-out');
-        }
-      }
+  if (remaining.length === 1) {
+    await eventRef.update({ winnerId: remaining[0].id });
+  } else {
+    await eventRef.update({ winnerId: firebase.firestore.FieldValue.delete() });
+  }
 
-      // Re-render knockout list
-      updateKnockoutList(eventId);
-    });
+  // Update button text and style
+  btn.textContent = knockedOut ? '🔁 Undo Knockout' : '💀 Knockout';
+  const li = btn.closest('li');
+  if (li) {
+    li.classList.toggle('knocked-out', knockedOut);
+  }
+
+  updateKnockoutList(eventId);
+});
+
   });
 }
 function getPoints(place, totalPlayers) {
@@ -530,6 +535,8 @@ async function updateKnockoutList(eventId) {
   const knockoutSection = document.getElementById('knockout-section');
   const knockoutList = document.getElementById('knockout-list');
   knockoutList.innerHTML = '';
+const eventDoc = await db.collection('events').doc(eventId).get();
+const winnerId = eventDoc.data().winnerId || null;
 
   const knockedOutPlayers = players
     .filter(p => p.knockedOut && p.knockedOutAt)
@@ -548,12 +555,12 @@ async function updateKnockoutList(eventId) {
   });
 
   // 🏆 Add winner at the bottom (if one remaining)
-  const winner = players.find(p => !knockedOutIds.has(p.id));
-  if (winner) {
-    const li = document.createElement('li');
-    li.innerHTML = `🏆 ${winner.firstName || 'Unknown'} ${winner.lastName || ''} <strong>(1st Place, Points: ${getPoints(1, players.length)})</strong>`;
-    knockoutList.appendChild(li); // ✅ Appended at the end
-  }
+  const winner = players.find(p => p.id === winnerId);
+if (winner) {
+  const li = document.createElement('li');
+  li.innerHTML = `🏆 ${winner.firstName || 'Unknown'} ${winner.lastName || ''} <strong>(1st Place, Points: ${getPoints(1, players.length)})</strong>`;
+  knockoutList.appendChild(li);
+}
 
   knockoutSection.style.display = players.length > 1 ? 'block' : 'none';
 }
