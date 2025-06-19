@@ -279,6 +279,7 @@ updateBlindDisplay();
 db.collection('events').doc(eventId).collection('rsvps')
   .onSnapshot(() => {
     updateKnockoutList(eventId);
+    updatePotAndPayouts(); // ✅ live update of pot, chip total, and average stack
   });
 
 };      // ✅ Closes window.onload
