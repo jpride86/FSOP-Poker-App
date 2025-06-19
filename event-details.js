@@ -60,8 +60,7 @@ function nextLevel() {
       document.getElementById('next-btn').disabled = false;
     }, 300);
 
-    pauseTimer(); // prevents timer from double triggering
-    currentLevelIndex += 1;
+        currentLevelIndex += 1;
     const lvl = standardBlinds[currentLevelIndex];
     timeRemaining = lvl.duration * 60;
     alarmPlayed = false;
@@ -81,7 +80,6 @@ function previousLevel() {
       document.getElementById('previous-btn').disabled = false;
     }, 300);
 
-    pauseTimer();
     currentLevelIndex -= 1;
     const lvl = standardBlinds[currentLevelIndex];
     timeRemaining = lvl.duration * 60;
@@ -557,8 +555,9 @@ function flashRed() {
 }
 
 function startTimer() {
-  if (!isPaused) return;
+  if (!isPaused || timerInterval) return; // ✅ prevent multiple intervals
   isPaused = false;
+
 
   timerInterval = setInterval(() => {
     if (timeRemaining > 0) {
@@ -581,9 +580,13 @@ document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${forma
 }
 
 function pauseTimer() {
-  clearInterval(timerInterval);
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
   isPaused = true;
 }
+
 
 function resetTimer() {
   pauseTimer();
