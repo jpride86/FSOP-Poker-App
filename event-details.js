@@ -555,6 +555,7 @@ async function updateKnockoutList(eventId) {
 } else {
   knockoutSection.style.display = 'none';
 }
+} // ✅ Closes updateKnockoutList function
 
 
 
