@@ -636,6 +636,8 @@ db.collection('events').doc(eventId).collection('timer').doc('state')
                 updateBlindDisplay();
       }
     }
-  });
+   });
+
+
 
 
