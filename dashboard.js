@@ -226,40 +226,58 @@ window.onload = function () {
 async function finalizeEventPoints(eventId) {
   const db = firebase.firestore();
   const eventRef = db.collection('events').doc(eventId);
-  const snapshot = await eventRef.collection('rsvps').get();
+  const rsvpsRef = eventRef.collection('rsvps');
+  const snapshot = await rsvpsRef.get();
 
   let players = [];
   let winner = null;
 
-  snapshot.forEach(doc => {
+  // Step 1: Gather players and reset their points
+  for (const doc of snapshot.docs) {
     const data = doc.data();
+
+    // Wipe placement and pointsEarned
+    await rsvpsRef.doc(doc.id).update({
+      placement: firebase.firestore.FieldValue.delete(),
+      pointsEarned: firebase.firestore.FieldValue.delete()
+    });
+
+    // Reset leaguePoints in users
+    await db.collection('users').doc(doc.id).set({
+      leaguePoints: 0
+    }, { merge: true });
+
     if (data.knockedOut && data.knockedOutAt) {
       players.push({ id: doc.id, ...data });
     } else if (!data.knockedOut) {
       winner = { id: doc.id, ...data };
     }
-  });
+  }
 
   if (winner) players.push(winner);
 
-  for (let i = 0; i < players.length; i++) {
-    const place = players.length - i;
-const raw = 10 * Math.sqrt(players.length) / Math.sqrt(place);
-const rounded = Math.round(raw * 100) / 100;
-const points = Math.max(Math.round(3 * (rounded - 9) + 10), 1);
+  // Step 2: Recalculate points with new formula
+  const numPlayers = players.length;
+  for (let i = 0; i < numPlayers; i++) {
+    const place = numPlayers - i;
+
+    // Updated points formula
+    const raw = 10 * Math.sqrt(numPlayers) / Math.sqrt(place);
+    const rounded = Math.round(raw * 100) / 100;
+    const points = Math.max(Math.round(3 * (rounded - 9) + 10), 1);
 
     const userId = players[i].id;
 
     await db.collection('users').doc(userId).set({
-      leaguePoints: firebase.firestore.FieldValue.increment(points)
+      leaguePoints: points
     }, { merge: true });
 
-    await eventRef.collection('rsvps').doc(userId).set({
+    await rsvpsRef.doc(userId).set({
       placement: place,
       pointsEarned: points
     }, { merge: true });
   }
 
   await eventRef.set({ finalized: true }, { merge: true });
-  alert('League points and placements finalized.');
+  alert('League points and placements reset and finalized.');
 }
