@@ -489,38 +489,44 @@ function updatePotAndPayouts() {
     const dealerCut = dealerFee * nonDealerCount;
 
     const potSection = document.getElementById('pot-info');
-    const payoutStructure = generatePayoutTable(players.length, pot); // ✅ returns structure array
-  
-await db.collection('events').doc(eventId).update({
-  payoutStructure: payoutStructure.map(p => ({
-    place: p.place,
-    percent: p.percent,
-    amount: p.roundedAmount
-  }))
-});
+
+    const payoutStructure = generatePayoutTable(players.length, pot); // structure array
+
+    // ✅ Save structured payout to Firestore
+    await db.collection('events').doc(eventId).update({
+      payoutStructure: payoutStructure.map(p => ({
+        place: p.place,
+        percent: p.percent,
+        amount: p.roundedAmount
+      }))
+    });
 
     if (potSection) {
       const startingChips = parseFloat(document.getElementById('starting-chips').value) || 1500;
-const totalChips = startingChips * (paidPlayers.length + totalRebuys);
+      const totalChips = startingChips * (paidPlayers.length + totalRebuys);
+      const remainingPlayers = players.filter(p => p.paid && !p.knockedOut).length || 1;
+      const avgChips = totalChips / remainingPlayers;
 
-const remainingPlayers = players.filter(p => p.paid && !p.knockedOut).length || 1;
+      document.getElementById('total-chips-text').innerHTML = `<strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}`;
+      document.getElementById('average-stack-text').innerHTML = `<strong>Average Stack:</strong> ${Math.round(avgChips).toLocaleString()}`;
 
-const avgChips = totalChips / remainingPlayers;
+      // ✅ NEW — format the payout table as HTML string
+      const payoutHtml = `
+        <br/><strong>Payout Structure (rounded down to nearest $5):</strong><ul>
+        ${payoutStructure.map(p => `<li>${p.place}: ${p.percent}% → $${p.roundedAmount.toFixed(2)}</li>`).join('')}
+        </ul>
+      `;
 
-document.getElementById('total-chips-text').innerHTML = `<strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}`;
-document.getElementById('average-stack-text').innerHTML = `<strong>Average Stack:</strong> ${Math.round(avgChips).toLocaleString()}`;
+      potSection.innerHTML =
+        `<h3>💰 Payout Structure</h3>` +
+        `<strong>Total Pot (Buy-ins + Rebuys):</strong> $${pot.toFixed(2)}<br/>` +
+        payoutHtml;
 
-potSection.innerHTML =
-  `<h3>💰 Payout Structure</h3>` +
-  `<strong>Total Pot (Buy-ins + Rebuys):</strong> $${pot.toFixed(2)}<br/>` +
-  generatePayoutTable(players.length, pot);
-
-  updateDealerPayoutSection();
-
-
+      updateDealerPayoutSection();
     }
   });
 }
+
 
 function toggleKnockout(eventId, userId, btn) {
   const ref = firebase.firestore().collection('events').doc(eventId).collection('rsvps').doc(userId);
