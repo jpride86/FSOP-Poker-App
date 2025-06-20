@@ -244,8 +244,10 @@ async function finalizeEventPoints(eventId) {
 
   for (let i = 0; i < players.length; i++) {
     const place = players.length - i;
-    const raw = 10 * Math.sqrt(players.length) / Math.sqrt(place);
-const points = Math.round(3 * (Math.round(raw * 100) / 100 - 9) + 10);
+const raw = 10 * Math.sqrt(players.length) / Math.sqrt(place);
+const rounded = Math.round(raw * 100) / 100;
+const points = Math.max(Math.round(3 * (rounded - 9) + 10), 1);
+
     const userId = players[i].id;
 
     await db.collection('users').doc(userId).set({
