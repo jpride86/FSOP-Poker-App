@@ -561,12 +561,11 @@ function toggleKnockout(eventId, userId, btn) {
 
   });
 }
-function getPoints(place, totalPlayers) {
-  // Example: WSOP-style point system
-  if (place === 1) return totalPlayers * 10;
-  if (place === 2) return Math.floor(totalPlayers * 7);
-  if (place === 3) return Math.floor(totalPlayers * 5);
-  return Math.max(totalPlayers - place + 1, 1);
+function getPoints(rank, totalPlayers) {
+  const raw = 10 * Math.sqrt(totalPlayers) / Math.sqrt(rank);
+  const rounded = Math.round(raw * 100) / 100;
+  const result = 3 * (rounded - 9) + 10;
+  return Math.max(Math.round(result), 1);
 }
 
 
