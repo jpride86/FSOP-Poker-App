@@ -269,13 +269,25 @@ console.log(players.map(p => ({ id: p.id, knockedOut: p.knockedOut, knockedOutAt
     const userId = players[i].id;
 
     await db.collection('users').doc(userId).set({
-      leaguePoints: firebase.firestore.FieldValue.increment(points)
-    }, { merge: true });
+  leaguePoints: firebase.firestore.FieldValue.increment(points)
+}, { merge: true });
 
-    await rsvpsRef.doc(userId).set({
-      placement: place,
-      pointsEarned: points
-    }, { merge: true });
+await rsvpsRef.doc(userId).set({
+  placement: place,
+  pointsEarned: points
+}, { merge: true });
+
+// ✅ ADD this: track event played
+await db.collection('users').doc(userId)
+  .collection('eventsPlayed')
+  .doc(eventId)
+  .set({
+    eventId,
+    points: points,
+    placement: place,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
   }
 
   await eventRef.set({ finalized: true }, { merge: true });
