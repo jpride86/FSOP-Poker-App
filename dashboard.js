@@ -230,9 +230,8 @@ async function finalizeEventPoints(eventId) {
   const snapshot = await rsvpsRef.get();
 
   let players = [];
-  let winner = null;
 
-  // Step 1: Gather players and reset their points
+  // Step 1: Reset fields and collect paid players
   for (const doc of snapshot.docs) {
     const data = doc.data();
 
@@ -242,26 +241,27 @@ async function finalizeEventPoints(eventId) {
       pointsEarned: firebase.firestore.FieldValue.delete()
     });
 
-    // Reset leaguePoints in users
-    await db.collection('users').doc(doc.id).set({
-      leaguePoints: 0
-    }, { merge: true });
-
-    if (data.knockedOut && data.knockedOutAt) {
-      players.push({ id: doc.id, ...data });
-    } else if (!data.knockedOut) {
-      winner = { id: doc.id, ...data };
+    if (data.paid) {
+      players.push({
+        id: doc.id,
+        knockedOut: data.knockedOut || false,
+        knockedOutAt: data.knockedOutAt || 0
+      });
     }
   }
+console.log(players.map(p => ({ id: p.id, knockedOut: p.knockedOut, knockedOutAt: p.knockedOutAt })));
 
-  if (winner) players.push(winner);
+  // Step 2: Sort players by knockout time (winner last)
+  players.sort((a, b) => {
+    if (!a.knockedOut && b.knockedOut) return 1;
+    if (a.knockedOut && !b.knockedOut) return -1;
+    return b.knockedOutAt - a.knockedOutAt;
+  });
 
-  // Step 2: Recalculate points with new formula
+  // Step 3: Assign points based on final formula
   const numPlayers = players.length;
   for (let i = 0; i < numPlayers; i++) {
     const place = numPlayers - i;
-
-    // Updated points formula
     const raw = 10 * Math.sqrt(numPlayers) / Math.sqrt(place);
     const rounded = Math.round(raw * 100) / 100;
     const points = Math.max(Math.round(3 * (rounded - 9) + 10), 1);
@@ -269,7 +269,7 @@ async function finalizeEventPoints(eventId) {
     const userId = players[i].id;
 
     await db.collection('users').doc(userId).set({
-      leaguePoints: points
+      leaguePoints: firebase.firestore.FieldValue.increment(points)
     }, { merge: true });
 
     await rsvpsRef.doc(userId).set({
