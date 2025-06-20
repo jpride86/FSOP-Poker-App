@@ -359,31 +359,47 @@ function markAllPaid() {
 
 
 
-function generatePayoutTable(playerCount, pot) {
+function generatePayoutTable(playerCount, pot, showOnlyHtml = false) {
+
   let structure;
 
-  if (playerCount <= 10) {
+  if (playerCount <= 6) {
+    structure = [
+      { place: '1st', percent: 65 },
+      { place: '2nd', percent: 35 }
+    ];
+  } else if (playerCount <= 10) {
     structure = [
       { place: '1st', percent: 50 },
       { place: '2nd', percent: 30 },
-      { place: '3rd', percent: 20 },
+      { place: '3rd', percent: 20 }
     ];
-  } else if (playerCount <= 20) {
-    structure = [
-      { place: '1st', percent: 50 },
-      { place: '2nd', percent: 25 },
-      { place: '3rd', percent: 15 },
-      { place: '4th', percent: 10 },
-    ];
-  } else {
+  } else if (playerCount <= 15) {
     structure = [
       { place: '1st', percent: 40 },
       { place: '2nd', percent: 25 },
       { place: '3rd', percent: 20 },
-      { place: '4th', percent: 10 },
-      { place: '5th', percent: 5 },
+      { place: '4th', percent: 15 }
     ];
-  }
+  } else if (playerCount <= 20) {
+    structure = [
+      { place: '1st', percent: 37.5 },
+      { place: '2nd', percent: 25 },
+      { place: '3rd', percent: 17.5 },
+      { place: '4th', percent: 12.5 },
+      { place: '5th', percent: 7.5 }
+    ];
+  } else {
+  // 21+ players (custom structure)
+  structure = [
+    { place: '1st', percent: 35 },
+    { place: '2nd', percent: 22.5 },
+    { place: '3rd', percent: 17.5 },
+    { place: '4th', percent: 12.5 },
+    { place: '5th', percent: 7.5 },
+    { place: '6th', percent: 5 }
+  ];
+}
 
   // Step 1: Raw payout amounts
   let payouts = structure.map(s => ({
@@ -401,7 +417,6 @@ function generatePayoutTable(playerCount, pot) {
   const totalRounded = payouts.reduce((sum, s) => sum + s.roundedAmount, 0);
   let leftover = Math.floor(pot - totalRounded); // Never overpay
 
-  // Add leftover to 1st place without exceeding their original raw amount
   if (leftover > 0) {
     let first = payouts[0];
     const maxTopUp = Math.floor(first.rawAmount - first.roundedAmount);
@@ -410,14 +425,14 @@ function generatePayoutTable(playerCount, pot) {
     leftover -= bonus;
   }
 
-  // Display
   let html = '<br/><strong>Payout Structure (rounded down to nearest $5):</strong><ul>';
   payouts.forEach(s => {
     html += `<li>${s.place}: ${s.percent}% → $${s.roundedAmount.toFixed(2)}</li>`;
   });
   html += '</ul>';
 
-  return html;
+  return showOnlyHtml ? html : payouts;
+
 }
 function updateDealerPayoutSection() {
   const dealerFee = parseFloat(document.getElementById('dealer-fee').value || 0);
@@ -474,6 +489,16 @@ function updatePotAndPayouts() {
     const dealerCut = dealerFee * nonDealerCount;
 
     const potSection = document.getElementById('pot-info');
+    const payoutStructure = generatePayoutTable(players.length, pot); // ✅ returns structure array
+  
+await db.collection('events').doc(eventId).update({
+  payoutStructure: payoutStructure.map(p => ({
+    place: p.place,
+    percent: p.percent,
+    amount: p.roundedAmount
+  }))
+});
+
     if (potSection) {
       const startingChips = parseFloat(document.getElementById('starting-chips').value) || 1500;
 const totalChips = startingChips * (paidPlayers.length + totalRebuys);
