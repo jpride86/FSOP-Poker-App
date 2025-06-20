@@ -22,28 +22,33 @@ window.onload = function () {
       .orderBy('leaguePoints', 'desc')
       .limit(100)
       .get()
-      .then(snapshot => {
+      .then(async snapshot => {
+
         const tbody = document.getElementById('league-body');
         let rank = 1;
 
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
-          const points = data.leaguePoints || 0;
-          const eventsPlayed = data.eventsPlayed || 0;
-          const lifetimeWinnings = data.lifetimeWinnings || 0;
+        for (const doc of snapshot.docs) {
+  const data = doc.data();
+  const fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+  const points = data.leaguePoints || 0;
+  const lifetimeWinnings = data.lifetimeWinnings || 0;
 
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${rank++}</td>
-            <td>${fullName}</td>
-            <td>${points}</td>
-            <td>${eventsPlayed}</td>
-            <td>$${lifetimeWinnings.toLocaleString()}</td>
-          `;
+  // 🔄 Count number of events played from subcollection
+  const eventsSnap = await db.collection('users').doc(doc.id).collection('eventsPlayed').get();
+  const eventsPlayed = eventsSnap.size;
 
-          tbody.appendChild(row);
-        });
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${rank++}</td>
+    <td>${fullName}</td>
+    <td>${points}</td>
+    <td>${eventsPlayed}</td>
+    <td>$${lifetimeWinnings.toLocaleString()}</td>
+  `;
+
+  tbody.appendChild(row);
+}
+
       })
       .catch(err => {
         console.error("Error loading league data:", err);
