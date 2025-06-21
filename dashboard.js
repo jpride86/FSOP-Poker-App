@@ -242,21 +242,17 @@ viewRsvpsBtn.addEventListener('click', () => {
 loadEvents();
 
 // ✅ When toggle changes
-  showArchivedCheckbox.addEventListener('change', () => {
-    loadEvents(showArchivedCheckbox.checked);
-  });
-    }
-  });
+        showArchivedCheckbox.addEventListener('change', () => {
+      loadEvents(showArchivedCheckbox.checked);
+    });
 
-    } else {
-      window.location.href = "index.html";
-    }
-  });
+  } // end if user && user.emailVerified
+}); // end auth.onAuthStateChanged
 
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut().then(() => window.location.href = "index.html");
-  });
-};
+logoutBtn.addEventListener('click', () => {
+  auth.signOut().then(() => window.location.href = "index.html");
+});
+}; // end window.onload
 
 async function finalizeEventPoints(eventId) {
   const db = firebase.firestore();
