@@ -12,6 +12,8 @@ window.onload = function () {
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  emailjs.init('-MfFWvDLyx3wdn_Py'); // ✅ Replace with your actual EmailJS public key
+
   const logoutBtn = document.getElementById('logout-btn');
   const welcomeMsg = document.getElementById('welcome-msg');
   const eventsList = document.getElementById('events-list');
@@ -181,15 +183,50 @@ rsvpBtn.addEventListener('click', async () => {
   }
 });
 
-inviteBtn.addEventListener('click', () => {
-  const url = `${window.location.origin}/event-details.html?id=${eventId}`;
-  navigator.clipboard.writeText(url)
-    .then(() => alert('Event link copied to clipboard!'))
-    .catch(err => {
-      console.error('Failed to copy link:', err);
-      alert('Could not copy event link.');
-    });
+inviteBtn.addEventListener('click', async () => {
+  inviteBtn.disabled = true;
+  inviteBtn.textContent = "Sending...";
+  
+  try {
+    const usersSnapshot = await db.collection('users')
+      .where('emailVerified', '==', true)
+      .get();
+
+    const emailList = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        email: data.email,
+        name: `${data.firstName || ''} ${data.lastName || ''}`.trim()
+      };
+    }).filter(u => u.email);
+
+    const eventLink = `${window.location.origin}/event-details.html?id=${eventId}`;
+    const eventDate = data.date.toDate().toLocaleString();
+    const eventName = data.name;
+    const eventLocation = data.location;
+
+    for (const user of emailList) {
+      await emailjs.send('FSOP-INVITE-EMAIL', 'template_pniycye', {
+        to_email: user.email,
+        to_name: user.name,
+        event_name: eventName,
+        event_date: eventDate,
+        event_location: eventLocation,
+        rsvp_link: eventLink,
+        from_name: "FSOP Poker"
+      });
+    }
+
+    alert('Invitations sent to verified users.');
+  } catch (err) {
+    console.error('Failed to send invites:', err);
+    alert('Error sending invitations.');
+  }
+
+  inviteBtn.disabled = false;
+  inviteBtn.textContent = "Invite";
 });
+
 
 editBtn.addEventListener('click', () => {
   window.location.href = `edit-event.html?id=${eventId}`;
