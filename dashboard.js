@@ -242,17 +242,12 @@ viewRsvpsBtn.addEventListener('click', () => {
 loadEvents();
 
 // ✅ When toggle changes
-showArchivedCheckbox.addEventListener('change', () => {
-  loadEvents(showArchivedCheckbox.checked);
-});
+  showArchivedCheckbox.addEventListener('change', () => {
+    loadEvents(showArchivedCheckbox.checked);
+  });
+    }
+  });
 
-         
-
-                
-            
-            });
-          }
-        });
     } else {
       window.location.href = "index.html";
     }
