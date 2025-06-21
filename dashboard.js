@@ -197,24 +197,23 @@ inviteBtn.addEventListener('click', async () => {
     const usersSnapshot = await db.collection('users').get();
 
 
-    inviteList.innerHTML = usersSnapshot.docs
+    const users = usersSnapshot.docs
   .map(doc => {
     const u = doc.data();
     const name = `${u.firstName || ''} ${u.lastName || ''}`.trim();
-    const email = u.email;
+    const email = (u.email || '').trim();
+    return { name, email };
+  });
 
-    if (email && email.trim() !== "") {
-      return `<label><input type="checkbox" class="invite-checkbox" data-email="${email}" data-name="${name}"> ${name}</label><br>`;
-    } else {
-      return `<label style="color:gray;"><input type="checkbox" disabled> ${name} (No email)</label><br>`;
-    }
-  })
-  .sort((a, b) => {
-    const nameA = (a.match(/>(.*?)</) || [])[1] || '';
-    const nameB = (b.match(/>(.*?)</) || [])[1] || '';
-    return nameA.localeCompare(nameB);
-  })
-  .join('');
+users.sort((a, b) => a.name.localeCompare(b.name));
+
+inviteList.innerHTML = users.map(user => {
+  if (user.email) {
+    return `<label><input type="checkbox" class="invite-checkbox" data-email="${user.email}" data-name="${user.name}"> ${user.name}</label><br>`;
+  } else {
+    return `<label style="color:gray;"><input type="checkbox" disabled> ${user.name} (No email)</label><br>`;
+  }
+}).join('');
 
     // Select all toggle
     selectAll.checked = false;
@@ -223,9 +222,17 @@ inviteBtn.addEventListener('click', async () => {
     };
 
     sendBtn.onclick = async () => {
-      const selected = Array.from(document.querySelectorAll('.invite-checkbox'))
-        .filter(cb => cb.checked)
-        .map(cb => ({ email: cb.dataset.email, name: cb.dataset.name }));
+  const selected = Array.from(document.querySelectorAll('.invite-checkbox'))
+    .filter(cb =>
+      cb.checked &&
+      cb.dataset.email &&
+      cb.dataset.email.trim() !== '' &&
+      cb.dataset.email.includes('@')
+    )
+    .map(cb => ({
+      email: cb.dataset.email.trim(),
+      name: cb.dataset.name
+    }));
 
       if (selected.length === 0) {
         alert("Please select at least one player.");
