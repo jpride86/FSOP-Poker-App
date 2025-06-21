@@ -194,9 +194,8 @@ inviteBtn.addEventListener('click', async () => {
   inviteList.innerHTML = 'Loading...';
 
   try {
-    const usersSnapshot = await db.collection('users')
-      .where('emailVerified', '==', true)
-      .get();
+    const usersSnapshot = await db.collection('users').get();
+
 
     const emailList = usersSnapshot.docs.map(doc => {
       const u = doc.data();
