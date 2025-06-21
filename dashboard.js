@@ -29,7 +29,12 @@ window.onload = function () {
 
 function loadEvents(showArchived = false) {
   let query = db.collection('events').orderBy('date', 'asc');
-  if (!showArchived) query = query.where('finalized', '==', false);
+  if (showArchived) {
+  query = query.where('finalized', '==', true);
+} else {
+  query = query.where('finalized', '==', false);
+}
+
 
   query.onSnapshot(snapshot => {
     eventsList.innerHTML = '';
