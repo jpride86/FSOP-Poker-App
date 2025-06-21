@@ -33,27 +33,40 @@ window.onload = function () {
   const points = data.leaguePoints || 0;
   const lifetimeWinnings = data.lifetimeWinnings || 0;
 
-  // 🔄 Count number of events played from subcollection
+  let firsts = 0;
+  let seconds = 0;
+  let thirds = 0;
+
+  // 🔄 Fetch events played
   const eventsSnap = await db.collection('users').doc(doc.id).collection('eventsPlayed').get();
   const eventsPlayed = eventsSnap.size;
 
+  eventsSnap.forEach(eventDoc => {
+    const placement = eventDoc.data().placement;
+    if (placement === 1) firsts++;
+    else if (placement === 2) seconds++;
+    else if (placement === 3) thirds++;
+  });
+
   const row = document.createElement('tr');
   let medal = '';
-if (rank === 1) medal = '🥇 ';
-else if (rank === 2) medal = '🥈 ';
-else if (rank === 3) medal = '🥉 ';
+  if (rank === 1) medal = '🥇 ';
+  else if (rank === 2) medal = '🥈 ';
+  else if (rank === 3) medal = '🥉 ';
 
-row.innerHTML = `
-  <td>${rank}</td>
-  <td>${medal}${fullName}</td>
-  <td>${points}</td>
-  <td>${eventsPlayed}</td>
-`;
-rank++;
-
-
+  row.innerHTML = `
+    <td>${rank}</td>
+    <td>${medal}${fullName}</td>
+    <td>${points}</td>
+    <td>${eventsPlayed}</td>
+    <td>${firsts}</td>
+    <td>${seconds}</td>
+    <td>${thirds}</td>
+  `;
+  rank++;
   tbody.appendChild(row);
 }
+
 
       })
       .catch(err => {
