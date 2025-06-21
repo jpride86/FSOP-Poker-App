@@ -29,9 +29,17 @@
   </div>
 
   <div class="container">
-    <h2>Upcoming Events</h2>
-    <div id="events-list"></div>
-  </div>
+  <h2>Events</h2>
+  
+  <!-- 🔁 Show Archived Toggle -->
+  <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+    <input type="checkbox" id="show-archived" />
+    Show Archived Events
+  </label>
+
+  <div id="events-list"></div>
+</div>
+
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
