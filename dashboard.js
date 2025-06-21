@@ -197,14 +197,18 @@ inviteBtn.addEventListener('click', async () => {
     const usersSnapshot = await db.collection('users').get();
 
 
-    const emailList = usersSnapshot.docs.map(doc => {
-      const u = doc.data();
-      return {
-        id: doc.id,
-        email: u.email,
-        name: `${u.firstName || ''} ${u.lastName || ''}`.trim()
-      };
-    }).filter(u => u.email);
+    const emailList = usersSnapshot.docs
+  .map(doc => {
+    const u = doc.data();
+    return {
+      id: doc.id,
+      email: u.email,
+      name: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+      firstName: u.firstName || ''
+    };
+  })
+  .filter(u => u.email)
+  .sort((a, b) => a.firstName.localeCompare(b.firstName));
 
     inviteList.innerHTML = emailList.map(user =>
       `<label><input type="checkbox" class="invite-checkbox" data-email="${user.email}" data-name="${user.name}"> ${user.name}</label><br>`
