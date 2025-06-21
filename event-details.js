@@ -197,6 +197,12 @@ db.collection('events').doc(eventId).update({ buyIn, dealerFee, startingChips })
       ...rsvpDoc.data()
     };
   }));
+players.sort((a, b) => {
+  const nameA = `${a.firstName || ''} ${a.lastName || ''}`.toLowerCase();
+  const nameB = `${b.firstName || ''} ${b.lastName || ''}`.toLowerCase();
+  return nameA.localeCompare(nameB);
+});
+    
 
   let html = "<strong>RSVP'd Players:</strong><ul>";
 players.forEach((p, i) => {
