@@ -39,13 +39,15 @@ query.get().then(snapshot => {
 
   snapshot.forEach(doc => {
     const data = doc.data();
-    const isFinalized = data.finalized === true;
+    // 🧠 Treat undefined or false as unfinalized
+const isFinalized = data.finalized === true;
 
-    // Skip finalized events if not showing archived
-    if (!showArchived && isFinalized) return;
+// ✅ Skip finalized events when not showing archive
+if (!showArchived && isFinalized) return;
 
-    // Skip unfinalized events if showing only archived
-    if (showArchived && !isFinalized) return;
+// ✅ Skip unfinalized (or missing) events when showing archive only
+if (showArchived && !isFinalized && data.finalized !== true) return;
+
 
     const eventId = doc.id;
 const date = data.date.toDate().toLocaleString('en-US', {
