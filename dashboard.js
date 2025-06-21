@@ -233,18 +233,21 @@ viewRsvpsBtn.addEventListener('click', () => {
         );
 
         Promise.all(promises).then(names => {
-          const playersPerTable = data.playersPerTable || 7;
-          const confirmedCount = Math.floor(names.length / playersPerTable) * playersPerTable;
+  names.sort((a, b) => a.localeCompare(b)); // ✅ alphabetical sort
 
-          let html = '<strong>RSVP List:</strong><ul style="padding-left: 20px;">';
-          names.forEach((name, i) => {
-            const confirmed = i < confirmedCount;
-            html += `<li>${name} ${confirmed ? '✅' : '⏳'} ${confirmed ? '(Confirmed)' : '(Waitlist)'}</li>`;
-          });
-          html += '</ul>';
-          rsvpListDiv.innerHTML = html;
-          rsvpListDiv.style.display = 'block';
-        });
+  const playersPerTable = data.playersPerTable || 7;
+  const confirmedCount = Math.floor(names.length / playersPerTable) * playersPerTable;
+
+  let html = '<strong>RSVP List:</strong><ul style="padding-left: 20px;">';
+  names.forEach((name, i) => {
+    const confirmed = i < confirmedCount;
+    html += `<li>${name} ${confirmed ? '✅' : '⏳'} ${confirmed ? '(Confirmed)' : '(Waitlist)'}</li>`;
+  });
+  html += '</ul>';
+  rsvpListDiv.innerHTML = html;
+  rsvpListDiv.style.display = 'block';
+});
+
       }
     });
   } else {
