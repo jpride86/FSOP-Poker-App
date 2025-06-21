@@ -119,27 +119,38 @@ window.onload = function () {
               eventsList.appendChild(div);
 
               // RSVP button logic
-              rsvpBtn.addEventListener('click', () => {
-                const rsvpRef = db.collection('events').doc(eventId).collection('rsvps').doc(userId);
+              rsvpBtn.addEventListener('click', async () => {
+  const rsvpRef = db.collection('events').doc(eventId).collection('rsvps').doc(userId);
 
-                rsvpRef.get().then(doc => {
-                  if (doc.exists) {
-                    rsvpRef.delete().then(() => {
-                      alert('RSVP cancelled.');
-                    });
-                  } else {
-                    rsvpRef.set({
-                      userId: userId,
-                      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    }).then(() => {
-                      alert('RSVP confirmed.');
-                    });
-                  }
-                }).catch(err => {
-                  console.error('RSVP toggle failed:', err);
-                  alert('Could not update RSVP.');
-                });
-              });
+  try {
+    const rsvpDoc = await rsvpRef.get();
+
+    if (rsvpDoc.exists) {
+      await rsvpRef.delete();
+      alert('RSVP cancelled.');
+    } else {
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.data();
+
+      await rsvpRef.set({
+        userId: userId,
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        paid: false,
+        dealer: false,
+        rebuys: 0,
+        knockedOut: false,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      alert('RSVP confirmed.');
+    }
+  } catch (err) {
+    console.error('RSVP toggle failed:', err);
+    alert('Could not update RSVP.');
+  }
+});
+
 
               inviteBtn.addEventListener('click', () => {
                 const url = `${window.location.origin}/event-details.html?id=${eventId}`;
