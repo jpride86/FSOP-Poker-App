@@ -29,55 +29,64 @@ window.onload = function () {
 
 function loadEvents(showArchived = false) {
   let query = db.collection('events').orderBy('date', 'asc');
-  if (showArchived) {
-  query = query.where('finalized', '==', true);
-} else {
-  query = query.where('finalized', '==', false);
-}
+
+query.get().then(snapshot => {
+  eventsList.innerHTML = '';
+  if (snapshot.empty) {
+    eventsList.innerHTML = '<p>No events found.</p>';
+    return;
+  }
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const isFinalized = data.finalized === true;
+
+    // Skip finalized events if not showing archived
+    if (!showArchived && isFinalized) return;
+
+    // Skip unfinalized events if showing only archived
+    if (showArchived && !isFinalized) return;
+
+    const eventId = doc.id;
+const date = data.date.toDate().toLocaleString('en-US', {
+  dateStyle: 'long', timeStyle: 'short'
+});
+
+// ✅ CREATE the event container
+const div = document.createElement('div');
+div.style.padding = "12px";
+div.style.border = "1px solid #ccc";
+div.style.borderRadius = "8px";
+div.style.marginBottom = "15px";
+div.style.backgroundColor = "#f9f9f9";
+
+// ✅ CREATE RSVP button
+const rsvpBtn = document.createElement('button');
+rsvpBtn.className = 'rsvp-btn';
+rsvpBtn.dataset.id = eventId;
+
+// RSVP status
+db.collection('events').doc(eventId).collection('rsvps').doc(userId)
+  .onSnapshot(rsvpDoc => {
+    const isRSVPed = rsvpDoc.exists;
+    rsvpBtn.textContent = isRSVPed ? 'Cancel RSVP' : 'RSVP';
+  });
+
+div.innerHTML = `
+  <strong>${data.name}</strong> ${isFinalized ? '✔️ <span style="color:green">(Finalized)</span>' : ''}<br/>
+  <p><strong>When:</strong> ${date}</p>
+  <p><strong>Where:</strong> ${data.location}</p>
+  <p><strong>Min Players per Table:</strong> ${data.playersPerTable}</p>
+  <p><strong>Max RSVP:</strong> ${data.maxRSVP || 'N/A'}</p>
+  <p><strong>Notes:</strong> ${data.notes || '—'}</p>
+`;
 
 
-  query.onSnapshot(snapshot => {
-    eventsList.innerHTML = '';
-    if (snapshot.empty) {
-      eventsList.innerHTML = '<p>No events found.</p>';
-      return;
-    }
+    // ... your rendering code continues here
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const isFinalized = data.finalized === true;
-      const eventId = doc.id;
-      const date = data.date.toDate().toLocaleString('en-US', {
-        dateStyle: 'long', timeStyle: 'short'
-      });
 
-      const div = document.createElement('div');
-      div.style.padding = "12px";
-      div.style.border = "1px solid #ccc";
-      div.style.borderRadius = "8px";
-      div.style.marginBottom = "15px";
-      div.style.backgroundColor = "#f9f9f9";
 
-      const rsvpBtn = document.createElement('button');
-      rsvpBtn.className = 'rsvp-btn';
-      rsvpBtn.dataset.id = eventId;
-
-      // RSVP status
-      db.collection('events').doc(eventId).collection('rsvps').doc(userId)
-        .onSnapshot(rsvpDoc => {
-          const isRSVPed = rsvpDoc.exists;
-          rsvpBtn.textContent = isRSVPed ? 'Cancel RSVP' : 'RSVP';
-        });
-
-      div.innerHTML = `
-        <strong>${data.name}</strong> ${isFinalized ? '✔️ <span style="color:green">(Finalized)</span>' : ''}<br/>
-        <p><strong>When:</strong> ${date}</p>
-        <p><strong>Where:</strong> ${data.location}</p>
-        <p><strong>Min Players per Table:</strong> ${data.playersPerTable}</p>
-        <p><strong>Max RSVP:</strong> ${data.maxRSVP || 'N/A'}</p>
-        <p><strong>Notes:</strong> ${data.notes || '—'}</p>
-      `;
-
+  
       // 👇 keep all your button rendering logic below
       // like finalize button, RSVP button, etc.
 
