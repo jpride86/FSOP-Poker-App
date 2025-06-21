@@ -60,7 +60,8 @@ elBlinds.innerHTML = `<div style="font-size: 7.5em;"><strong>Blinds:</strong> ${
   }
 
   // ✅ Always update the timer display
-  document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
+  document.getElementById('timer').innerHTML = `<div style="font-size: 8.5em;"><strong>Duration:</strong> ${formatTime(timeRemaining)}</div>`;
+
 }
 
 function logout() {
@@ -513,8 +514,8 @@ function updatePotAndPayouts() {
       const remainingPlayers = players.filter(p => p.paid && !p.knockedOut).length || 1;
       const avgChips = totalChips / remainingPlayers;
 
-      document.getElementById('total-chips-text').innerHTML = `<strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}`;
-      document.getElementById('average-stack-text').innerHTML = `<strong>Average Stack:</strong> ${Math.round(avgChips).toLocaleString()}`;
+      document.getElementById('total-chips-text').innerHTML = `<div style="font-size: 5.3em;"><strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}</div>`;
+document.getElementById('average-stack-text').innerHTML = `<div style="font-size: 5.3em;"><strong>Average Stack:</strong> ${Math.round(avgChips).toLocaleString()}</div>`;
 
       // ✅ NEW — format the payout table as HTML string
       const payoutHtml = `
