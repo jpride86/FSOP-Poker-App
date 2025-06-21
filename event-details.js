@@ -265,7 +265,9 @@ updateDealerPayoutSection();
 document.getElementById('pot-info').style.display = 'block';
   rsvpSection.style.display = 'block';
     updateKnockoutList(eventId);  // ✅ Ensures knockout list (incl. winner) shows after refresh
-    updatePotAndPayouts(); // ✅ Add this line to update average stack
+updatePotAndPayouts(); // ✅ Update pot and chip display
+updatePlayersRemaining(); // ✅ Show players remaining count
+
 
 
   // ✅ Knockout List Rendering
@@ -299,7 +301,8 @@ updateBlindDisplay();
 db.collection('events').doc(eventId).collection('rsvps')
   .onSnapshot(() => {
     updateKnockoutList(eventId);
-    updatePotAndPayouts(); // ✅ live update of pot, chip total, and average stack
+    updatePotAndPayouts();
+    updatePlayersRemaining(); // ✅ live update of players remaining
   });
 
 };      // ✅ Closes window.onload
@@ -484,6 +487,27 @@ function updateDealerPayoutSection() {
         </ul>
       `;
     }
+  });
+}
+function updatePlayersRemaining() {
+  const rsvpRef = db.collection('events').doc(eventId).collection('rsvps');
+
+  rsvpRef.get().then(snapshot => {
+    let total = 0;
+    let remaining = 0;
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.paid) {
+        total++;
+        if (!data.knockedOut) {
+          remaining++;
+        }
+      }
+    });
+
+    const el = document.getElementById('players-remaining');
+    if (el) el.textContent = `${remaining} of ${total} Remaining`;
   });
 }
 
