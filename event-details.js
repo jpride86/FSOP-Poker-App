@@ -56,7 +56,7 @@ function updateBlindDisplay() {
     elBlinds.textContent = '';
   } else {
     elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
-elBlinds.innerHTML = `<div style="font-size: 1.5em;"><strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)</div>`;
+elBlinds.innerHTML = `<div style="font-size: 3.5em;"><strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)</div>`;
   }
 
   // ✅ Always update the timer display
