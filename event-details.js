@@ -49,19 +49,31 @@ function updateBlindDisplay() {
   const lvl = standardBlinds[currentLevelIndex];
   const elLevel = document.getElementById('current-level');
   const elBlinds = document.getElementById('blinds');
+  const elNext = document.getElementById('next-level-blinds');
 
   if (lvl.type === 'break') {
     elLevel.textContent = lvl.level;
     elLevel.style.color = 'red';
     elBlinds.textContent = '';
+    elNext.textContent = '';
   } else {
     elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
-elBlinds.innerHTML = `<div style="font-size: 3.5em;"><strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)</div>`;
+    elLevel.style.color = 'black';
+    elBlinds.innerHTML = `<div style="font-size: 3.5em;"><strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)</div>`;
+
+    const next = standardBlinds[currentLevelIndex + 1];
+    if (next) {
+      if (next.type === 'blind') {
+        elNext.innerHTML = `<strong>Next:</strong> ${next.small} / ${next.big}`;
+      } else {
+        elNext.innerHTML = `<strong>Next:</strong> ${next.level}`;
+      }
+    } else {
+      elNext.innerHTML = '';
+    }
   }
 
-  // ✅ Always update the timer display
   document.getElementById('timer').innerHTML = `<div style="font-size: 2.5em;"><strong>Duration:</strong> ${formatTime(timeRemaining)}</div>`;
-
 }
 
 function logout() {
