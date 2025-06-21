@@ -207,6 +207,7 @@ viewRsvpsBtn.addEventListener('click', () => {
     rsvpRef.get().then(snapshot => {
       if (snapshot.empty) {
         rsvpListDiv.innerHTML = '<em>No RSVPs yet.</em>';
+        rsvpListDiv.style.display = 'block';
       } else {
         const promises = snapshot.docs.map(doc =>
           db.collection('users').doc(doc.id).get().then(userDoc => {
@@ -226,9 +227,9 @@ viewRsvpsBtn.addEventListener('click', () => {
           });
           html += '</ul>';
           rsvpListDiv.innerHTML = html;
+          rsvpListDiv.style.display = 'block';
         });
       }
-      rsvpListDiv.style.display = 'block';
     });
   } else {
     rsvpListDiv.style.display = 'none';
