@@ -44,20 +44,27 @@ const localDatetimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
     db.collection('events').add({
-      name: eventName,
-      date: firebase.firestore.Timestamp.fromDate(new Date(eventDate)),
-      location,
-      playersPerTable,
-      maxRSVP,
-      notes,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      document.getElementById('event-message').innerText = '✅ Event created!';
-      document.getElementById('create-event-form').reset();
-    }).catch(err => {
-      console.error(err);
-      document.getElementById('event-message').innerText = '❌ Failed to create event.';
-    });
+  name: eventName.trim(),
+  date: new Date(eventDate),
+  location: location.trim(),
+  playersPerTable: playersPerTable,
+  maxRSVP: maxRSVP,
+  notes: notes.trim(),
+  finalized: false, // ✅ set by default
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+})
+.then(() => {
+  document.getElementById('event-message').innerText = '✅ Event created! Redirecting...';
+  setTimeout(() => {
+    window.location.href = 'dashboard.html'; // change this if your dashboard filename is different
+  }, 1000); // waits 1 second before redirecting
+})
+
+.catch(err => {
+  console.error(err);
+  document.getElementById('event-message').innerText = '❌ Failed to create event.';
+});
+
   });
 // ✅ Logout button handler
   const logoutBtn = document.getElementById('logout-btn');
