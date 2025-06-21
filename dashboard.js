@@ -249,7 +249,7 @@ showArchivedCheckbox.addEventListener('change', () => {
          
 
                 
-              });
+            
             });
           }
         });
