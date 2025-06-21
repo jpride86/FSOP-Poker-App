@@ -197,22 +197,24 @@ inviteBtn.addEventListener('click', async () => {
     const usersSnapshot = await db.collection('users').get();
 
 
-    const emailList = usersSnapshot.docs
+    inviteList.innerHTML = usersSnapshot.docs
   .map(doc => {
     const u = doc.data();
-    return {
-      id: doc.id,
-      email: u.email,
-      name: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
-      firstName: u.firstName || ''
-    };
-  })
-  .filter(u => u.email)
-  .sort((a, b) => a.firstName.localeCompare(b.firstName));
+    const name = `${u.firstName || ''} ${u.lastName || ''}`.trim();
+    const email = u.email;
 
-    inviteList.innerHTML = emailList.map(user =>
-      `<label><input type="checkbox" class="invite-checkbox" data-email="${user.email}" data-name="${user.name}"> ${user.name}</label><br>`
-    ).join('');
+    if (email && email.trim() !== "") {
+      return `<label><input type="checkbox" class="invite-checkbox" data-email="${email}" data-name="${name}"> ${name}</label><br>`;
+    } else {
+      return `<label style="color:gray;"><input type="checkbox" disabled> ${name} (No email)</label><br>`;
+    }
+  })
+  .sort((a, b) => {
+    const nameA = (a.match(/>(.*?)</) || [])[1] || '';
+    const nameB = (b.match(/>(.*?)</) || [])[1] || '';
+    return nameA.localeCompare(nameB);
+  })
+  .join('');
 
     // Select all toggle
     selectAll.checked = false;
