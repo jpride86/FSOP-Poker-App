@@ -44,8 +44,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <!-- Load EmailJS library -->
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <!-- Load EmailJS v4 SDK (via module) -->
+<script type="module">
+  import emailjs from 'https://cdn.emailjs.com/dist/email.min.mjs';
+  emailjs.init('-MfFWvDLyx3wdn_Py'); // 🔁 Replace with your actual public key
+  window.emailjs = emailjs; // 👈 Make globally accessible to dashboard.js
+</script>
+
 
 <!-- Your Firebase + dashboard logic -->
 <script src="dashboard.js"></script>
