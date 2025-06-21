@@ -60,7 +60,7 @@ elBlinds.innerHTML = `<div style="font-size: 7.5em;"><strong>Blinds:</strong> ${
   }
 
   // ✅ Always update the timer display
-  document.getElementById('timer').innerHTML = `<div style="font-size: 5.5em;"><strong>Duration:</strong> ${formatTime(timeRemaining)}</div>`;
+  document.getElementById('timer').innerHTML = `<div style="font-size: 3.5em;"><strong>Duration:</strong> ${formatTime(timeRemaining)}</div>`;
 
 }
 
