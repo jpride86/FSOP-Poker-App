@@ -53,8 +53,15 @@ if (showArchived && !isFinalized && data.finalized !== true) return;
 
     const eventId = doc.id;
 const date = data.date.toDate().toLocaleString('en-US', {
-  dateStyle: 'long', timeStyle: 'short'
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  hour12: true
 });
+
 
 // ✅ CREATE the event container
 const div = document.createElement('div');
