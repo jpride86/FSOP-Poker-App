@@ -26,9 +26,10 @@ window.onload = function () {
       });
 
       db.collection('events')
-        .orderBy('date', 'asc')
-        .limit(10)
-        .onSnapshot(snapshot => {
+  .where('finalized', '==', false)
+  .orderBy('date', 'asc')
+  .limit(10)
+  .onSnapshot(snapshot => {
           eventsList.innerHTML = '';
 
           if (snapshot.empty) {
