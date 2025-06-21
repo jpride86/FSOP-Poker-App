@@ -99,15 +99,16 @@ window.onload = function () {
               deleteBtn.textContent = "Delete";
               deleteBtn.dataset.id = eventId;
 
-              const finalizeBtn = document.createElement('button');
+             const finalizeBtn = document.createElement('button');
 finalizeBtn.textContent = "Finalize Points";
 finalizeBtn.dataset.id = eventId;
 
-if (isFinalized) {
+if (data.finalized === true) {
   finalizeBtn.disabled = true;
   finalizeBtn.style.opacity = 0.5;
   finalizeBtn.style.cursor = 'not-allowed';
 }
+
 
               actions.appendChild(inviteBtn);
               actions.appendChild(rsvpBtn);
