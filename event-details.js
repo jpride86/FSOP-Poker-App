@@ -64,7 +64,8 @@ function updateBlindDisplay() {
     const next = standardBlinds[currentLevelIndex + 1];
     if (next) {
       if (next.type === 'blind') {
-        elNext.innerHTML = `<strong>Next:</strong> ${next.small} / ${next.big}`;
+        elNext.innerHTML = `<strong>Next Blinds:</strong> ${next.small} (S) / ${next.big} (B)`;
+
       } else {
         elNext.innerHTML = `<strong>Next:</strong> ${next.level}`;
       }
