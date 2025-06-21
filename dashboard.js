@@ -184,49 +184,86 @@ rsvpBtn.addEventListener('click', async () => {
 });
 
 inviteBtn.addEventListener('click', async () => {
-  inviteBtn.disabled = true;
-  inviteBtn.textContent = "Sending...";
-  
+  const modal = document.getElementById('invite-modal');
+  const inviteList = document.getElementById('invite-list');
+  const sendBtn = document.getElementById('send-invites-btn');
+  const selectAll = document.getElementById('select-all-checkbox');
+  const toast = document.getElementById('invite-toast');
+
+  modal.style.display = 'flex';
+  inviteList.innerHTML = 'Loading...';
+
   try {
     const usersSnapshot = await db.collection('users')
       .where('emailVerified', '==', true)
       .get();
 
     const emailList = usersSnapshot.docs.map(doc => {
-      const data = doc.data();
+      const u = doc.data();
       return {
-        email: data.email,
-        name: `${data.firstName || ''} ${data.lastName || ''}`.trim()
+        id: doc.id,
+        email: u.email,
+        name: `${u.firstName || ''} ${u.lastName || ''}`.trim()
       };
     }).filter(u => u.email);
 
-    const eventLink = `${window.location.origin}/event-details.html?id=${eventId}`;
-    const eventDate = data.date.toDate().toLocaleString();
-    const eventName = data.name;
-    const eventLocation = data.location;
+    inviteList.innerHTML = emailList.map(user =>
+      `<label><input type="checkbox" class="invite-checkbox" data-email="${user.email}" data-name="${user.name}"> ${user.name}</label><br>`
+    ).join('');
 
-    for (const user of emailList) {
-      await emailjs.send('FSOP-INVITE-EMAIL', 'template_pniycye', {
-        to_email: user.email,
-        to_name: user.name,
-        event_name: eventName,
-        event_date: eventDate,
-        event_location: eventLocation,
-        rsvp_link: eventLink,
-        from_name: "FSOP Poker"
-      });
-    }
+    // Select all toggle
+    selectAll.checked = false;
+    selectAll.onchange = () => {
+      document.querySelectorAll('.invite-checkbox').forEach(cb => cb.checked = selectAll.checked);
+    };
 
-    alert('Invitations sent to verified users.');
+    sendBtn.onclick = async () => {
+      const selected = Array.from(document.querySelectorAll('.invite-checkbox'))
+        .filter(cb => cb.checked)
+        .map(cb => ({ email: cb.dataset.email, name: cb.dataset.name }));
+
+      if (selected.length === 0) {
+        alert("Please select at least one player.");
+        return;
+      }
+
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Sending...";
+
+      const eventLink = `${window.location.origin}/event-details.html?id=${eventId}`;
+      const eventDate = data.date.toDate().toLocaleString();
+      const eventName = data.name;
+      const eventLocation = data.location;
+
+      try {
+        for (const user of selected) {
+          await emailjs.send('FSOP-INVITE-EMAIL', 'template_pniycye', {
+            to_email: user.email,
+            to_name: user.name,
+            event_name: eventName,
+            event_date: eventDate,
+            event_location: eventLocation,
+            rsvp_link: eventLink,
+            from_name: "FSOP Poker"
+          });
+        }
+
+        modal.style.display = 'none';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+      } catch (err) {
+        console.error("Failed to send invites:", err);
+        alert("Error sending invites.");
+      }
+
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Send Invites";
+    };
   } catch (err) {
-    console.error('Failed to send invites:', err);
-    alert('Error sending invitations.');
+    inviteList.innerHTML = "Failed to load user list.";
+    console.error(err);
   }
-
-  inviteBtn.disabled = false;
-  inviteBtn.textContent = "Invite";
 });
-
 
 editBtn.addEventListener('click', () => {
   window.location.href = `edit-event.html?id=${eventId}`;
