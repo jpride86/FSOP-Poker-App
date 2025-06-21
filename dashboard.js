@@ -233,7 +233,7 @@ inviteList.innerHTML = users.map(user => {
       email: cb.dataset.email.trim(),
       name: cb.dataset.name
     }));
-
+console.log("Selected users to invite:", selected); // ✅ ADD THIS HERE
       if (selected.length === 0) {
         alert("Please select at least one player.");
         return;
