@@ -25,82 +25,87 @@ window.onload = function () {
         welcomeMsg.textContent = `Welcome ${data.firstName || "Player"}!`;
       });
 
-      db.collection('events')
-  .where('finalized', '==', false)
-  .orderBy('date', 'asc')
-  .limit(10)
-  .onSnapshot(snapshot => {
-          eventsList.innerHTML = '';
+      const showArchivedCheckbox = document.getElementById('show-archived');
 
-          if (snapshot.empty) {
-            eventsList.innerHTML = '<p>No events found.</p>';
-          } else {
-            snapshot.forEach(doc => {
-              const data = doc.data();
-              const isFinalized = data.finalized === true;
-              const eventId = doc.id;
-              const date = data.date.toDate().toLocaleString('en-US', {
-                dateStyle: 'long',
-                timeStyle: 'short'
-              });
+function loadEvents(showArchived = false) {
+  let query = db.collection('events').orderBy('date', 'asc');
+  if (!showArchived) query = query.where('finalized', '==', false);
 
-              const div = document.createElement('div');
-              div.style.padding = "12px";
-              div.style.border = "1px solid #ccc";
-              div.style.borderRadius = "8px";
-              div.style.marginBottom = "15px";
-              div.style.backgroundColor = "#f9f9f9";
+  query.onSnapshot(snapshot => {
+    eventsList.innerHTML = '';
+    if (snapshot.empty) {
+      eventsList.innerHTML = '<p>No events found.</p>';
+      return;
+    }
 
-              const rsvpBtn = document.createElement('button');
-              rsvpBtn.className = 'rsvp-btn';
-              rsvpBtn.dataset.id = eventId;
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const isFinalized = data.finalized === true;
+      const eventId = doc.id;
+      const date = data.date.toDate().toLocaleString('en-US', {
+        dateStyle: 'long', timeStyle: 'short'
+      });
 
-              // Listen to the individual RSVP status
-              db.collection('events').doc(eventId).collection('rsvps').doc(userId)
-                .onSnapshot(rsvpDoc => {
-                  const isRSVPed = rsvpDoc.exists;
-                  rsvpBtn.textContent = isRSVPed ? 'Cancel RSVP' : 'RSVP';
-                });
+      const div = document.createElement('div');
+      div.style.padding = "12px";
+      div.style.border = "1px solid #ccc";
+      div.style.borderRadius = "8px";
+      div.style.marginBottom = "15px";
+      div.style.backgroundColor = "#f9f9f9";
 
-              div.innerHTML = `
-  <strong>${data.name}</strong> ${isFinalized ? '✔️ <span style="color:green">(Finalized)</span>' : ''}<br/>
-  <p><strong>When:</strong> ${date}</p>
-  <p><strong>Where:</strong> ${data.location}</p>
-  <p><strong>Min Players per Table:</strong> ${data.playersPerTable}</p>
-  <p><strong>Max RSVP:</strong> ${data.maxRSVP || 'N/A'}</p>
-  <p><strong>Notes:</strong> ${data.notes || '—'}</p>
-`;
+      const rsvpBtn = document.createElement('button');
+      rsvpBtn.className = 'rsvp-btn';
+      rsvpBtn.dataset.id = eventId;
 
+      // RSVP status
+      db.collection('events').doc(eventId).collection('rsvps').doc(userId)
+        .onSnapshot(rsvpDoc => {
+          const isRSVPed = rsvpDoc.exists;
+          rsvpBtn.textContent = isRSVPed ? 'Cancel RSVP' : 'RSVP';
+        });
 
-              const actions = document.createElement('div');
-              actions.className = 'event-actions';
-              actions.style.marginTop = "8px";
-              actions.style.display = "flex";
-              actions.style.flexWrap = "wrap";
-              actions.style.gap = "8px";
-              actions.style.rowGap = "16px";
+      div.innerHTML = `
+        <strong>${data.name}</strong> ${isFinalized ? '✔️ <span style="color:green">(Finalized)</span>' : ''}<br/>
+        <p><strong>When:</strong> ${date}</p>
+        <p><strong>Where:</strong> ${data.location}</p>
+        <p><strong>Min Players per Table:</strong> ${data.playersPerTable}</p>
+        <p><strong>Max RSVP:</strong> ${data.maxRSVP || 'N/A'}</p>
+        <p><strong>Notes:</strong> ${data.notes || '—'}</p>
+      `;
 
-              const inviteBtn = document.createElement('button');
-              inviteBtn.textContent = "Invite";
-              inviteBtn.dataset.id = eventId;
+      // 👇 keep all your button rendering logic below
+      // like finalize button, RSVP button, etc.
 
-              const viewRsvpsBtn = document.createElement('button');
-              viewRsvpsBtn.textContent = "View RSVPs";
-              viewRsvpsBtn.dataset.id = eventId;
+      // Finally, append:
+      const actions = document.createElement('div');
+actions.className = 'event-actions';
+actions.style.marginTop = "8px";
+actions.style.display = "flex";
+actions.style.flexWrap = "wrap";
+actions.style.gap = "8px";
+actions.style.rowGap = "16px";
 
-              const detailsBtn = document.createElement('button');
-              detailsBtn.textContent = "Event Details";
-              detailsBtn.dataset.id = eventId;
+const inviteBtn = document.createElement('button');
+inviteBtn.textContent = "Invite";
+inviteBtn.dataset.id = eventId;
 
-              const editBtn = document.createElement('button');
-              editBtn.textContent = "Edit";
-              editBtn.dataset.id = eventId;
+const viewRsvpsBtn = document.createElement('button');
+viewRsvpsBtn.textContent = "View RSVPs";
+viewRsvpsBtn.dataset.id = eventId;
 
-              const deleteBtn = document.createElement('button');
-              deleteBtn.textContent = "Delete";
-              deleteBtn.dataset.id = eventId;
+const detailsBtn = document.createElement('button');
+detailsBtn.textContent = "Event Details";
+detailsBtn.dataset.id = eventId;
 
-             const finalizeBtn = document.createElement('button');
+const editBtn = document.createElement('button');
+editBtn.textContent = "Edit";
+editBtn.dataset.id = eventId;
+
+const deleteBtn = document.createElement('button');
+deleteBtn.textContent = "Delete";
+deleteBtn.dataset.id = eventId;
+
+const finalizeBtn = document.createElement('button');
 finalizeBtn.textContent = "Finalize Points";
 finalizeBtn.dataset.id = eventId;
 
@@ -110,26 +115,25 @@ if (data.finalized === true) {
   finalizeBtn.style.cursor = 'not-allowed';
 }
 
+actions.appendChild(inviteBtn);
+actions.appendChild(rsvpBtn);
+actions.appendChild(viewRsvpsBtn);
+actions.appendChild(detailsBtn);
+actions.appendChild(editBtn);
+actions.appendChild(deleteBtn);
+actions.appendChild(finalizeBtn);
+div.appendChild(actions);
 
-              actions.appendChild(inviteBtn);
-              actions.appendChild(rsvpBtn);
-              actions.appendChild(viewRsvpsBtn);
-              actions.appendChild(detailsBtn);
-              actions.appendChild(editBtn);
-              actions.appendChild(deleteBtn);
-              actions.appendChild(finalizeBtn);
-              div.appendChild(actions);
+const rsvpListDiv = document.createElement('div');
+rsvpListDiv.className = 'rsvp-list';
+rsvpListDiv.style.display = 'none';
+rsvpListDiv.style.marginTop = '10px';
+div.appendChild(rsvpListDiv);
 
-              const rsvpListDiv = document.createElement('div');
-              rsvpListDiv.className = 'rsvp-list';
-              rsvpListDiv.style.display = 'none';
-              rsvpListDiv.style.marginTop = '10px';
-              div.appendChild(rsvpListDiv);
+eventsList.appendChild(div);
 
-              eventsList.appendChild(div);
-
-              // RSVP button logic
-              rsvpBtn.addEventListener('click', async () => {
+// RSVP button logic
+rsvpBtn.addEventListener('click', async () => {
   const rsvpRef = db.collection('events').doc(eventId).collection('rsvps').doc(userId);
 
   try {
@@ -161,75 +165,90 @@ if (data.finalized === true) {
   }
 });
 
+inviteBtn.addEventListener('click', () => {
+  const url = `${window.location.origin}/event-details.html?id=${eventId}`;
+  navigator.clipboard.writeText(url)
+    .then(() => alert('Event link copied to clipboard!'))
+    .catch(err => {
+      console.error('Failed to copy link:', err);
+      alert('Could not copy event link.');
+    });
+});
 
-              inviteBtn.addEventListener('click', () => {
-                const url = `${window.location.origin}/event-details.html?id=${eventId}`;
-                navigator.clipboard.writeText(url)
-                  .then(() => alert('Event link copied to clipboard!'))
-                  .catch(err => {
-                    console.error('Failed to copy link:', err);
-                    alert('Could not copy event link.');
-                  });
-              });
+editBtn.addEventListener('click', () => {
+  window.location.href = `edit-event.html?id=${eventId}`;
+});
 
-              editBtn.addEventListener('click', () => {
-                window.location.href = `edit-event.html?id=${eventId}`;
-              });
+detailsBtn.addEventListener('click', () => {
+  window.location.href = `event-details.html?id=${eventId}`;
+});
 
-              detailsBtn.addEventListener('click', () => {
-                window.location.href = `event-details.html?id=${eventId}`;
-              });
+deleteBtn.addEventListener('click', () => {
+  if (confirm('Are you sure you want to delete this event?')) {
+    db.collection('events').doc(eventId).delete()
+      .then(() => alert('Event deleted.'))
+      .catch(err => {
+        console.error('Error deleting event:', err);
+        alert('Failed to delete event.');
+      });
+  }
+});
 
-              deleteBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to delete this event?')) {
-                  db.collection('events').doc(eventId).delete()
-                    .then(() => alert('Event deleted.'))
-                    .catch(err => {
-                      console.error('Error deleting event:', err);
-                      alert('Failed to delete event.');
-                    });
-                }
-              });
+finalizeBtn.addEventListener('click', () => {
+  if (confirm('Finalize league points for this event? This action cannot be undone.')) {
+    finalizeEventPoints(eventId);
+  }
+});
 
-              finalizeBtn.addEventListener('click', () => {
-                if (confirm('Finalize league points for this event? This action cannot be undone.')) {
-                  finalizeEventPoints(eventId);
-                }
-              });
+viewRsvpsBtn.addEventListener('click', () => {
+  const rsvpRef = db.collection('events').doc(eventId).collection('rsvps');
 
-              viewRsvpsBtn.addEventListener('click', () => {
-                const rsvpRef = db.collection('events').doc(eventId).collection('rsvps');
+  if (rsvpListDiv.style.display === 'none') {
+    rsvpRef.get().then(snapshot => {
+      if (snapshot.empty) {
+        rsvpListDiv.innerHTML = '<em>No RSVPs yet.</em>';
+      } else {
+        const promises = snapshot.docs.map(doc =>
+          db.collection('users').doc(doc.id).get().then(userDoc => {
+            const u = userDoc.data();
+            return `${u?.firstName || 'Unknown'} ${u?.lastName || ''}`;
+          })
+        );
 
-                if (rsvpListDiv.style.display === 'none') {
-                  rsvpRef.get().then(snapshot => {
-                    if (snapshot.empty) {
-                      rsvpListDiv.innerHTML = '<em>No RSVPs yet.</em>';
-                    } else {
-                      const promises = snapshot.docs.map(doc =>
-                        db.collection('users').doc(doc.id).get().then(userDoc => {
-                          const u = userDoc.data();
-                          return `${u?.firstName || 'Unknown'} ${u?.lastName || ''}`;
-                        })
-                      );
+        Promise.all(promises).then(names => {
+          const playersPerTable = data.playersPerTable || 7;
+          const confirmedCount = Math.floor(names.length / playersPerTable) * playersPerTable;
 
-                      Promise.all(promises).then(names => {
-                        const playersPerTable = data.playersPerTable || 7;
-                        const confirmedCount = Math.floor(names.length / playersPerTable) * playersPerTable;
+          let html = '<strong>RSVP List:</strong><ul style="padding-left: 20px;">';
+          names.forEach((name, i) => {
+            const confirmed = i < confirmedCount;
+            html += `<li>${name} ${confirmed ? '✅' : '⏳'} ${confirmed ? '(Confirmed)' : '(Waitlist)'}</li>`;
+          });
+          html += '</ul>';
+          rsvpListDiv.innerHTML = html;
+        });
+      }
+      rsvpListDiv.style.display = 'block';
+    });
+  } else {
+    rsvpListDiv.style.display = 'none';
+  }
+});
+   });
+  });
+}
 
-                        let html = '<strong>RSVP List:</strong><ul style="padding-left: 20px;">';
-                        names.forEach((name, i) => {
-                          const confirmed = i < confirmedCount;
-                          html += `<li>${name} ${confirmed ? '✅' : '⏳'} ${confirmed ? '(Confirmed)' : '(Waitlist)'}</li>`;
-                        });
-                        html += '</ul>';
-                        rsvpListDiv.innerHTML = html;
-                      });
-                    }
-                    rsvpListDiv.style.display = 'block';
-                  });
-                } else {
-                  rsvpListDiv.style.display = 'none';
-                }
+// ✅ Initial load
+loadEvents();
+
+// ✅ When toggle changes
+showArchivedCheckbox.addEventListener('change', () => {
+  loadEvents(showArchivedCheckbox.checked);
+});
+
+         
+
+                
               });
             });
           }
