@@ -250,7 +250,7 @@ console.log("Selected users to invite:", selected); // ✅ ADD THIS HERE
       try {
         for (const user of selected) {
           await emailjs.send('FSOP-INVITE-EMAIL', 'template_pniycye', {
-            to_email: user.email,
+            email: user.email,
             to_name: user.name,
             event_name: eventName,
             event_date: eventDate,
