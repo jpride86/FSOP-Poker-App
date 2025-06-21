@@ -3,35 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" type="image/png" href="fsop-logo.png">
-
   <title>League Table</title>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="league.js" defer></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
       background-color: #f4f4f4;
     }
+
     h1 {
       color: #007BFF;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
     }
+
     th, td {
       padding: 10px;
       border: 1px solid #ccc;
       text-align: left;
     }
+
     th {
       background-color: #e9ecef;
     }
-    button {
+
+    .primary-btn {
       padding: 10px 20px;
       border: none;
       background-color: #007BFF;
@@ -39,36 +45,59 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    button:hover {
+
+    .primary-btn:hover {
       background-color: #0056b3;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
   </style>
 </head>
+
 <body>
+  <!-- 🔝 Top Buttons -->
+  <div class="top-bar">
+    <button class="primary-btn" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
+    <button class="primary-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- 🏆 FSOP Header -->
   <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
-  <img src="fsop-logo.png" alt="FSOP Logo" style="height: 160px;" />
-  <h1 style="margin: 0; font-size: 2rem;">🏆 League Table</h1>
-</div>
+    <img src="fsop-logo.png" alt="FSOP Logo" style="height: 80px;" />
+    <h1 style="margin: 0; font-size: 2rem;">🏆 League Table</h1>
+  </div>
 
-
-
+  <!-- 📊 Table -->
   <table id="league-table">
     <thead>
-  <tr>
-    <th>Rank</th>
-    <th>Player</th>
-    <th>Points</th>
-    <th>Events</th>
-    <th><span style="white-space: nowrap;">🥇 1st</span></th>
-    <th><span style="white-space: nowrap;">🥈 2nd</span></th>
-    <th><span style="white-space: nowrap;">🥉 3rd</span></th>
-  </tr>
-</thead>
-
-
+      <tr>
+        <th>Rank</th>
+        <th>Player</th>
+        <th>Points</th>
+        <th>Events</th>
+        <th><span style="white-space: nowrap;">🥇 1st</span></th>
+        <th><span style="white-space: nowrap;">🥈 2nd</span></th>
+        <th><span style="white-space: nowrap;">🥉 3rd</span></th>
+      </tr>
+    </thead>
     <tbody id="league-body"></tbody>
   </table>
 
-  <button onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
+  <!-- ⬅️ Optional Extra Back Button -->
+  <button class="primary-btn" onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
+
+  <!-- 🔐 Logout Script -->
+  <script>
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = "index.html";
+      });
+    }
+  </script>
 </body>
 </html>
