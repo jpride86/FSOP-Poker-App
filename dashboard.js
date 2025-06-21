@@ -250,7 +250,16 @@ console.log("Selected users to invite:", selected); // ✅ ADD THIS HERE
       sendBtn.textContent = "Sending...";
 
       const eventLink = `https://jpride86.github.io/FSOP-Poker-App/index.html`;
-      const eventDate = data.date.toDate().toLocaleString();
+      const eventDate = data.date.toDate().toLocaleString('en-US', {
+  weekday: 'long', // ➕ Day of the week
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true
+});
+
       const eventName = data.name;
       const eventLocation = data.location;
 
