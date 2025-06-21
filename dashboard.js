@@ -36,6 +36,7 @@ window.onload = function () {
           } else {
             snapshot.forEach(doc => {
               const data = doc.data();
+              const isFinalized = data.finalized === true;
               const eventId = doc.id;
               const date = data.date.toDate().toLocaleString('en-US', {
                 dateStyle: 'long',
@@ -61,13 +62,14 @@ window.onload = function () {
                 });
 
               div.innerHTML = `
-                <strong>${data.name}</strong><br/>
-                <p><strong>When:</strong> ${date}</p>
-                <p><strong>Where:</strong> ${data.location}</p>
-                <p><strong>Min Players per Table:</strong> ${data.playersPerTable}</p>
-                <p><strong>Max RSVP:</strong> ${data.maxRSVP || 'N/A'}</p>
-                <p><strong>Notes:</strong> ${data.notes || '—'}</p>
-              `;
+  <strong>${data.name}</strong> ${isFinalized ? '✔️ <span style="color:green">(Finalized)</span>' : ''}<br/>
+  <p><strong>When:</strong> ${date}</p>
+  <p><strong>Where:</strong> ${data.location}</p>
+  <p><strong>Min Players per Table:</strong> ${data.playersPerTable}</p>
+  <p><strong>Max RSVP:</strong> ${data.maxRSVP || 'N/A'}</p>
+  <p><strong>Notes:</strong> ${data.notes || '—'}</p>
+`;
+
 
               const actions = document.createElement('div');
               actions.className = 'event-actions';
@@ -98,8 +100,14 @@ window.onload = function () {
               deleteBtn.dataset.id = eventId;
 
               const finalizeBtn = document.createElement('button');
-              finalizeBtn.textContent = "Finalize Points";
-              finalizeBtn.dataset.id = eventId;
+finalizeBtn.textContent = "Finalize Points";
+finalizeBtn.dataset.id = eventId;
+
+if (isFinalized) {
+  finalizeBtn.disabled = true;
+  finalizeBtn.style.opacity = 0.5;
+  finalizeBtn.style.cursor = 'not-allowed';
+}
 
               actions.appendChild(inviteBtn);
               actions.appendChild(rsvpBtn);
