@@ -38,13 +38,19 @@ window.onload = function () {
   const eventsPlayed = eventsSnap.size;
 
   const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>${rank++}</td>
-    <td>${fullName}</td>
-    <td>${points}</td>
-    <td>${eventsPlayed}</td>
-    <td>$${lifetimeWinnings.toLocaleString()}</td>
-  `;
+  let medal = '';
+if (rank === 1) medal = '🥇 ';
+else if (rank === 2) medal = '🥈 ';
+else if (rank === 3) medal = '🥉 ';
+
+row.innerHTML = `
+  <td>${rank}</td>
+  <td>${medal}${fullName}</td>
+  <td>${points}</td>
+  <td>${eventsPlayed}</td>
+`;
+rank++;
+
 
   tbody.appendChild(row);
 }
