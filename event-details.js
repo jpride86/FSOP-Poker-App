@@ -56,11 +56,11 @@ function updateBlindDisplay() {
     elBlinds.textContent = '';
   } else {
     elLevel.innerHTML = `<strong>Level ${lvl.level}</strong>`;
-elBlinds.innerHTML = `<div style="font-size: 7.5em;"><strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)</div>`;
+elBlinds.innerHTML = `<div style="font-size: 3.5em;"><strong>Blinds:</strong> ${lvl.small} (S) / ${lvl.big} (B)</div>`;
   }
 
   // ✅ Always update the timer display
-  document.getElementById('timer').innerHTML = `<div style="font-size: 3.5em;"><strong>Duration:</strong> ${formatTime(timeRemaining)}</div>`;
+  document.getElementById('timer').innerHTML = `<div style="font-size: 2.5em;"><strong>Duration:</strong> ${formatTime(timeRemaining)}</div>`;
 
 }
 
@@ -514,8 +514,8 @@ function updatePotAndPayouts() {
       const remainingPlayers = players.filter(p => p.paid && !p.knockedOut).length || 1;
       const avgChips = totalChips / remainingPlayers;
 
-      document.getElementById('total-chips-text').innerHTML = `<div style="font-size: 5.3em;"><strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}</div>`;
-document.getElementById('average-stack-text').innerHTML = `<div style="font-size: 5.3em;"><strong>Average Stack:</strong> ${Math.round(avgChips).toLocaleString()}</div>`;
+      document.getElementById('total-chips-text').innerHTML = `<div style="font-size: 2.3em;"><strong>Total Chips in Play:</strong> ${totalChips.toLocaleString()}</div>`;
+document.getElementById('average-stack-text').innerHTML = `<div style="font-size: 2.3em;"><strong>Average Stack:</strong> ${Math.round(avgChips).toLocaleString()}</div>`;
 
       // ✅ NEW — format the payout table as HTML string
       const payoutHtml = `
