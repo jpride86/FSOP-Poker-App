@@ -75,18 +75,21 @@ window.onload = function () {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
 
-    if (!email) {
-      alert('Please enter your email address first.');
-      return;
-    }
+   if (!email) {
+  const manualEmail = prompt("Enter your email address:");
+  if (!manualEmail) return;
+  sendReset(manualEmail);
+} else {
+  sendReset(email);
+}
 
-    auth.sendPasswordResetEmail(email)
-      .then(() => {
-        alert('Password reset email sent. Please check your inbox.');
-      })
-      .catch((error) => {
-        console.error('Error sending password reset email:', error);
-        alert('Failed to send reset email. Please double-check your email.');
-      });
-  });
+function sendReset(targetEmail) {
+  auth.sendPasswordResetEmail(targetEmail)
+    .then(() => alert('Password reset email sent. Please check your inbox.'))
+    .catch((error) => {
+      console.error('Error sending password reset email:', error);
+      alert('Failed to send reset email. Please double-check your email.');
+    });
+}
+
 };
