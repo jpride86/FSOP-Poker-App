@@ -70,19 +70,20 @@ window.onload = function () {
       });
   });
 
-  // ✅ Forgot password functionality
   document.getElementById('forgot-password-link').addEventListener('click', function (e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
 
-   if (!email) {
-  const manualEmail = prompt("Enter your email address:");
-  if (!manualEmail) return;
-  sendReset(manualEmail);
-} else {
-  sendReset(email);
-}
+  if (!email) {
+    const manualEmail = prompt("Enter your email address:");
+    if (!manualEmail) return;
+    sendReset(manualEmail);
+  } else {
+    sendReset(email);
+  }
+});
 
+// ✅ Now outside the event listener
 function sendReset(targetEmail) {
   auth.sendPasswordResetEmail(targetEmail)
     .then(() => alert('Password reset email sent. Please check your inbox.'))
@@ -92,4 +93,3 @@ function sendReset(targetEmail) {
     });
 }
 
-};
