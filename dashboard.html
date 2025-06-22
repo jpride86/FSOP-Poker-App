@@ -5,27 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="fsop-logo.png">
   <title>Dashboard</title>
+
   <style>
-    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; }
-    .container { max-width: 700px; margin: 40px auto; background: #fff; padding: 25px 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .header-box { background-color: #007BFF; color: #fff; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-    .header-box h2 { margin: 0; }
-    button { padding: 10px 20px; border: none; border-radius: 5px; background-color: #007BFF; color: white; cursor: pointer; }
-    button:hover { background-color: #0056b3; }
-    .button-row { display: flex; gap: 10px; margin-bottom: 20px; }
-  </style>
+  body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; }
+
+  .container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  .header-box {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-box h2 {
+    margin: 0;
+    text-align: center;
+    flex-grow: 1;
+  }
+
+  .header-logo {
+    height: 80px;
+    width: auto;
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+</style>
+
 </head>
 <body>
-  <!-- FSOP Logos positioned in corners -->
-<img src="fsop-logo.png" alt="FSOP Logo" style="position: absolute; left: 20px; top: 30px; height: 150px;">
-<img src="fsop-logo.png" alt="FSOP Logo" style="position: absolute; right: 20px; top: 30px; height: 150px;">
+
 
 <!-- Centered Container -->
 <div class="container">
   <div class="header-box">
-    <h2 id="welcome-msg">Welcome to the Dashboard</h2>
-    <button id="logout-btn">Logout</button>
-  </div>
+  <img src="fsop-logo.png" alt="FSOP Logo Left" class="header-logo">
+  <h2 id="welcome-msg">Welcome to the Dashboard</h2>
+  <img src="fsop-logo.png" alt="FSOP Logo Right" class="header-logo">
+</div>
+
 
   <div class="button-row">
     <button onclick="window.location.href='create-event.html'">Create Event</button>
