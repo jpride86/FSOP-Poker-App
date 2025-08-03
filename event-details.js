@@ -693,7 +693,8 @@ function startTimer() {
   timerInterval = setInterval(() => {
   if (timeRemaining > 0) {
     timeRemaining--;
-    document.getElementById('timer').innerHTML = `<strong>Duration:</strong> ${formatTime(timeRemaining)}`;
+    document.getElementById('timer').innerHTML = `<div style="font-size: 2.5em;"><strong>Duration:</strong> ${formatTime(timeRemaining)}</div>`;
+
     syncTimerStateToFirestore(); // ✅ sync every second
 
       if (timeRemaining === 60 && !alarmPlayed) {
