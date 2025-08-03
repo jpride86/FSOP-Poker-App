@@ -293,6 +293,21 @@ if (knockedOutPlayers.length > 0) {
 document.getElementById('next-btn')?.addEventListener('click', nextLevel);
 document.getElementById('previous-btn')?.addEventListener('click', previousLevel);
 
+// ✅ Add Start, Pause, and Reset Button Listeners
+document.getElementById('start-btn')?.addEventListener('click', () => {
+  startTimer();
+  syncTimerStateToFirestore(); // ✅ sync state when starting
+});
+
+document.getElementById('pause-btn')?.addEventListener('click', () => {
+  pauseTimer();
+  syncTimerStateToFirestore(); // ✅ sync pause state
+});
+
+document.getElementById('reset-btn')?.addEventListener('click', () => {
+  resetTimer();
+});
+
 // ✅ Final call to update display — place at end of window.onload:
 updateBlindDisplay();
 
